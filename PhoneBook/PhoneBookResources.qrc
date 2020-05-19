@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/contacts">
+        <file>contacts.txt</file>
+    </qresource>
+</RCC>

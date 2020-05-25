@@ -40,5 +40,6 @@ private slots:
     void on_actionEllipse_triggered();
     void on_actionEraser_triggered();
     void on_actionSpray_triggered();
+    void on_actionColorpicker_triggered();
 };
 #endif // MAINWINDOW_H

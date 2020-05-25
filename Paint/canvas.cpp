@@ -105,7 +105,6 @@ void Canvas::redo()
        _image = _saves[++_curSave];
        update();
     }
-    qDebug() << _curSave << " "<< _lastAvailableSave << " "<< _saves.size();
     emit redoSignal(_curSave+1<=_lastAvailableSave);
     emit undoSignal(true);
 }
@@ -114,7 +113,6 @@ void Canvas::undo()
 {
     _image = _saves[--_curSave];
     update();
-    qDebug() << _curSave << " "<< _lastAvailableSave << " "<< _saves.size();
 
     emit undoSignal( _curSave);
     emit redoSignal(true);
@@ -123,31 +121,42 @@ void Canvas::undo()
 
 void Canvas::cut()
 {
+
     if(_selectionRect){
+
         QPainter painter(&_image);
         painter.fillRect(*_selectionRect, Qt::white);
         update(*_selectionRect);
         saveState();
         emit pasteSignal();
+        setTool(Paste);
     }
 
 }
 
 void Canvas::copy()
 {
-     if(_selectionRect) emit pasteSignal();
+     if(_selectionRect){
+         emit pasteSignal();
+         setTool(Paste);
+     }
 }
 
 void Canvas::paste()
 {
     setTool(Paste);
 }
+void Canvas::pickColor(QPoint pos){
+    _penColor = _image.pixelColor(pos);
+}
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     if(_tool == Pen || _tool == Eraser ) drawLineTo(event->pos());
+    else if(_tool == ColorPicker) pickColor(event->pos());
     else if(_tool == Spray) drawSpray(event->pos());
     else if(_tool == Select || _tool == Paste || _tool == Rectangle || _tool == Ellipse) {
+
         if( _selectionMode == None) { drawSelectionSquareTo(event->pos()); return; }
         else if(_selectionMode == Move){
             int dx = _bufferedRect->left() - _lastPoint.x();
@@ -188,7 +197,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 {
 
     if(_tool == Pen || _tool == Eraser) _lastPoint = event->pos();
-    else if(_tool = Spray) drawSpray(event->pos());
+    else if(_tool == ColorPicker) pickColor(event->pos());
+    else if(_tool == Spray) drawSpray(event->pos());
     else if(_tool == Bucket) fill(event->pos());
     else if(_tool == Paste){
         if(!hasBufferedArea()) return ;
@@ -266,7 +276,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
         delete _selectionRect;
         _selectionRect = nullptr;
     }
-    saveState();
+    if(_tool!= Select && _tool != ColorPicker) saveState();
 
 }
 
@@ -280,7 +290,6 @@ void Canvas::saveState()
 
     _lastAvailableSave = _curSave;
 
-    qDebug() << _curSave << " "<< _lastAvailableSave << " "<< _saves.size();
 
     emit undoSignal(true);
     emit redoSignal(false);

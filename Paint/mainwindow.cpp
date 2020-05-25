@@ -159,3 +159,8 @@ void MainWindow::on_actionSpray_triggered()
 {
     _canvas.setTool(Canvas::Spray);
 }
+
+void MainWindow::on_actionColorpicker_triggered()
+{
+    _canvas.setTool(Canvas::ColorPicker);
+}

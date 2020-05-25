@@ -14,7 +14,7 @@ class Canvas : public QWidget
     enum SelectionMode{ Left, Right, Top, Bottom, Move,None };
 
 public:
-    enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Spray };
+    enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Spray, ColorPicker };
 
     explicit Canvas(QWidget *parent = nullptr);
     ~Canvas();
@@ -63,6 +63,7 @@ private:
     bool hasSelectedArea();
     bool hasBufferedArea();
     void drawSpray(QPoint pos);
+    void pickColor(QPoint pos);
     QColor getToolColor();
 
     QColor _penColor;

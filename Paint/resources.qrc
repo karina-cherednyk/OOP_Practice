@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/adjust.png</file>
+        <file>icons/brush.png</file>
+        <file>icons/close.png</file>
+        <file>icons/delete.png</file>
+        <file>icons/erase.png</file>
+        <file>icons/fill.png</file>
+        <file>icons/new.png</file>
+        <file>icons/repeat.png</file>
+        <file>icons/save.png</file>
+        <file>icons/settings.png</file>
+        <file>icons/undo.png</file>
+        <file>icons/copy.png</file>
+        <file>icons/cut.png</file>
+        <file>icons/oval.png</file>
+        <file>icons/paste.png</file>
+        <file>icons/picker.png</file>
+        <file>icons/rectangle.png</file>
+        <file>icons/select.png</file>
+        <file>icons/spray.png</file>
+        <file>icons/wheel.png</file>
+        <file>icons/zoom_in.png</file>
+        <file>icons/zoom_out.png</file>
+    </qresource>
+</RCC>

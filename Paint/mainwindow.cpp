@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QColorDialog>
 #include <QInputDialog>
+#include "layerdelegate.h"
 #include "layermodel.h"
 #include <QModelIndex>
 #include <QToolButton>
@@ -67,8 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     layerList = rightDockContainer->findChild<QListView*>("layerList");
+    layerList->setItemDelegate(new LayerDelegate(this));
     layerList->setModel(_canvas.getModel());
-    layerList->setItemDelegate(new Delegate(this));
     layerList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     connect(layerList, SIGNAL(pressed(const QModelIndex&)),  &_canvas, SLOT(setCurrentLayer(const QModelIndex&)));

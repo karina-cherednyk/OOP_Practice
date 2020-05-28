@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QAbstractListModel>
 #include <QItemDelegate>
+#include <QStyledItemDelegate>
 
 
 class LayerModel : public QAbstractListModel
@@ -36,6 +37,13 @@ public:
         beginRemoveRows(parent, row, row+count-1);
         endRemoveRows();
         return true;
+    }
+    inline bool setData(const QModelIndex &index, const QVariant &value, int role=Qt::EditRole) override {
+        (*_layers)[index.row()].first() = value.toString();
+        return true;
+    }
+    inline Qt::ItemFlags flags(const QModelIndex &index) const override {
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
 
 private:

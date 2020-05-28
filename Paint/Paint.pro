@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     canvas.cpp \
+    layerdelegate.cpp \
     layermodel.cpp \
     main.cpp \
     mainwindow.cpp
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     Pair.h \
     canvas.h \
+    layerdelegate.h \
     layermodel.h \
     mainwindow.h
 

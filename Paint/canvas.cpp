@@ -15,7 +15,7 @@ Canvas::Canvas(QWidget *parent) :
     ui->setupUi(this);
 
     _layers.append(Pair<QString,QImage>("Layer 0",QImage(width(), height(), QImage::Format_ARGB32)));
-    _layers[0].second().fill(qRgba(255,255,255,0));
+    _layers[0].second().fill(Qt::transparent);
     _model.setLayersModel(&_layers);
     _model.insertRow(0);
 
@@ -36,10 +36,6 @@ void Canvas::paintEvent(QPaintEvent *event)
     QRect drawingArea = event->rect();
 
 
-//    for(QImage& im : _layers)  {
-//         resizeImage(&im,size());
-//        painter.drawImage(drawingArea, im, drawingArea);
-//    }
     for(int i=0; i<_layers.size();++i){
         painter.drawImage(drawingArea, _layers[i].second(),drawingArea);
     }
@@ -126,7 +122,7 @@ void Canvas::setTool(const Canvas::Tool &t)
 
 void Canvas::clearImage()
 {
-    _image->fill(qRgba(255,255,255,0));
+    _image->fill(Qt::transparent);
 
     _modified = true;
     saveState();
@@ -138,7 +134,7 @@ void Canvas::redo()
 {
 
     if(_curSave<_lastAvailableSave){
-       //_image = _saves[++_curSave];
+
        QPair<QImage*, QImage> pair = _saves[++_curSave];
        *pair.first = pair.second;
        update();
@@ -196,7 +192,6 @@ void Canvas::setCurrentLayer(const QModelIndex(& ind))
 void Canvas::insertLayer(const QModelIndex &ind)
 {
     int pos = _layers.empty() ? 0 : ind.row()+1;
-    qDebug() << (pos);
     _layers.insert(pos,
                        Pair<QString,QImage>(
                        QString("Layer %0").arg(_c++),
@@ -271,7 +266,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
         *_image = *_bufferedImage;
         QPainter painter(_image);
-        painter.fillRect(*_bufferedRect,Qt::white);
+        painter.save(); painter.setCompositionMode(QPainter::CompositionMode_Clear);
+        painter.fillRect(*_bufferedRect,Qt::transparent); painter.restore();
         painter.drawImage(*_selectionRect, *_bufferedImage, *_bufferedRect);
 
         update();
@@ -413,6 +409,7 @@ void Canvas::drawLineTo(const QPoint &nextPoint)
 {
 
     QPainter painter(_image);
+    if(_tool == Eraser) painter.setCompositionMode(QPainter::CompositionMode_Clear);
     painter.setPen(QPen(getToolColor(),_penWidth));
     painter.drawLine(_lastPoint,nextPoint);
 
@@ -443,7 +440,7 @@ void Canvas::resizeImage(QImage *image, const QSize &newSize)
     if(image->size() == newSize) return;
 
     QImage newImage(newSize, QImage::Format_ARGB32);
-    newImage.fill(qRgba(255,255,255,0));
+    newImage.fill(Qt::transparent);
     QPainter painter(&newImage);
 
     painter.drawImage(QPoint(0,0), *_image);
@@ -497,7 +494,7 @@ void Canvas::drawSpray(QPoint pos)
 
 QColor Canvas::getToolColor()
 {
-    if(_tool == Eraser) return Qt::white;
+    if(_tool == Eraser) return Qt::transparent;
     return _penColor;
 }
 

@@ -28,6 +28,8 @@ private slots:
 
     void on_findPhoneInput_textChanged(const QString &arg1);
 
+    void on_pushButton_clicked();
+
 protected:
     void closeEvent(QCloseEvent* e) override;
 private:

@@ -24,7 +24,9 @@ public:
 
     const QVector<Contact>& contacts() const;
 
-    const QModelIndex& contactWithNumber(const QString& num) const;
+    const QModelIndexList contactsWithNumber(const QString& num) const;
+
+    void addContact(const Contact& c);
 
 protected:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());

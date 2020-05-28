@@ -9,14 +9,20 @@
 #include <QAction>
 #include <QColorDialog>
 #include <QInputDialog>
+#include "layermodel.h"
+#include <QModelIndex>
+#include <QToolButton>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-    _canvas(this) , ui(new Ui::MainWindow)
-{
+    _canvas(this) , ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    setCentralWidget(&_canvas);
 
+
+    ui->container->setLayout(new QHBoxLayout);
+    ui->container->layout()->setMargin(0);
+    ui->container->layout()->addWidget(&_canvas);
 
     foreach (QByteArray format, QImageWriter::supportedImageFormats()) {
           QString text = QString(format).toUpper();
@@ -46,6 +52,29 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&_canvas, SIGNAL(redoSignal(bool)), ui->actionRedo, SLOT(setEnabled(bool)));
 
     connect(&_canvas, SIGNAL(pasteSignal()),  SLOT(enablePaste()));
+    //
+    connect(&_canvas, SIGNAL(enableCutCopy(bool)), ui->actionCut, SLOT(setEnabled(bool)));
+    connect(&_canvas, SIGNAL(enableCutCopy(bool)), ui->actionCopy, SLOT(setEnabled(bool)));
+    connect(&_canvas, SIGNAL(enableCutCopy(bool)), ui->actionPaste, SLOT(setEnabled(bool)));
+
+
+
+    //add/ remove layout
+    QWidget* rightDockContainer = ui->rightDockWidget->widget();
+    (rightDockContainer->findChild<QToolButton*>("addLayerButton"))->setDefaultAction(ui->actionAddLayer);
+    (rightDockContainer->findChild<QToolButton*>("removeLayerButton"))->setDefaultAction(ui->actionRemoveLayer);
+
+
+
+    layerList = rightDockContainer->findChild<QListView*>("layerList");
+    layerList->setModel(_canvas.getModel());
+    layerList->setItemDelegate(new Delegate(this));
+    layerList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    connect(layerList, SIGNAL(pressed(const QModelIndex&)),  &_canvas, SLOT(setCurrentLayer(const QModelIndex&)));
+    layerList->setCurrentIndex(_canvas.getModel()->index(0));
+    connect(&_canvas, SIGNAL(setSelected(const QModelIndex&)), layerList, SLOT(setCurrentIndex(const QModelIndex&)));
+
 
 }
 
@@ -147,7 +176,7 @@ void MainWindow::on_actionRectangle_triggered()
 
 void MainWindow::on_actionEllipse_triggered()
 {
-    _canvas.setTool(Canvas::Ellipse);
+      _canvas.setTool(Canvas::Ellipse);
 }
 
 void MainWindow::on_actionEraser_triggered()
@@ -157,10 +186,27 @@ void MainWindow::on_actionEraser_triggered()
 
 void MainWindow::on_actionSpray_triggered()
 {
-    _canvas.setTool(Canvas::Spray);
+     _canvas.setTool(Canvas::Spray);
 }
 
 void MainWindow::on_actionColorpicker_triggered()
 {
     _canvas.setTool(Canvas::ColorPicker);
+}
+
+
+
+
+
+void MainWindow::on_actionRemoveLayer_triggered()
+{
+    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    _canvas.removeLayer(selected);
+}
+
+void MainWindow::on_actionAddLayer_triggered()
+{
+
+    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    _canvas.insertLayer(selected);
 }

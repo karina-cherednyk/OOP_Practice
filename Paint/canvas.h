@@ -1,6 +1,9 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
+#include "Pair.h"
+#include "layermodel.h"
+
 #include <QWidget>
 
 namespace Ui {
@@ -12,6 +15,8 @@ class Canvas : public QWidget
     Q_OBJECT
 
     enum SelectionMode{ Left, Right, Top, Bottom, Move,None };
+    LayerModel _model;
+    int _c;
 
 public:
     enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Spray, ColorPicker };
@@ -38,12 +43,21 @@ public slots:
     void cut();
     void copy();
     void paste();
+    void setCurrentLayer(const QModelIndex& ind);
+    void insertLayer(const QModelIndex& ind);
+    void removeLayer(const QModelIndex& ind);
+    LayerModel* getModel();
 
 
 signals:
     void undoSignal(bool);
     void redoSignal(bool);
     void pasteSignal();
+    void enableCutCopy(bool);
+    void layerAdded(QImage* im);
+    void layerRemoved(const QModelIndex& ind);
+    void redrawLayout(int row);
+    void setSelected(const QModelIndex& ind);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -66,12 +80,13 @@ private:
     void pickColor(QPoint pos);
     QColor getToolColor();
 
+
     QColor _penColor;
-    QImage _image;
+
     QPoint _lastPoint;
     bool _modified;
     int _penWidth;
-    QList<QImage> _saves;
+    QList<QPair<QImage*,QImage>> _saves;
     int _curSave;
     int _lastAvailableSave;
     Tool _tool;
@@ -80,6 +95,8 @@ private:
     QImage* _bufferedImage;
     bool _selectionFinished;
     SelectionMode _selectionMode;
+    QImage* _image;
+    QList<Pair<QString,QImage>> _layers;
 };
 
 #endif // CANVAS_H

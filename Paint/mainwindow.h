@@ -6,6 +6,8 @@
 #include <QGraphicsView>
 #include <QMainWindow>
 #include<QDebug>
+#include <QStackedLayout>
+#include <QListView>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,6 +19,7 @@ class MainWindow : public QMainWindow
 
     Canvas _canvas;
 
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -25,6 +28,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QListView* layerList;
     bool requestSaving();
 
 private slots:
@@ -41,5 +45,10 @@ private slots:
     void on_actionEraser_triggered();
     void on_actionSpray_triggered();
     void on_actionColorpicker_triggered();
+
+
+
+    void on_actionRemoveLayer_triggered();
+    void on_actionAddLayer_triggered();
 };
 #endif // MAINWINDOW_H

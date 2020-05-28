@@ -22,5 +22,8 @@
         <file>icons/wheel.png</file>
         <file>icons/zoom_in.png</file>
         <file>icons/zoom_out.png</file>
+        <file>icons/background.png</file>
+        <file>icons/minus.png</file>
+        <file>icons/plus.png</file>
     </qresource>
 </RCC>

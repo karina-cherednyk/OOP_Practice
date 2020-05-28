@@ -7,7 +7,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QSortFilterProxyModel>
-#include <QFileInfo>
+#include <QMessageBox>
+
 
 MainWindow::MainWindow(const QString& fileName, QWidget *parent)
     : QMainWindow(parent)
@@ -17,6 +18,7 @@ MainWindow::MainWindow(const QString& fileName, QWidget *parent)
     QListView* namesList = ui->contactNamesList;
     QLineEdit *filter = ui->filterInput;
 
+    namesList->setSelectionMode( QAbstractItemView::ExtendedSelection );
 
 
     _model = new ContactListModel(this, _fileName);
@@ -55,9 +57,8 @@ void MainWindow::openNewWindow(const QModelIndex& index){
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    QFile outFile("../PhoneBook/contacts.txt");
+    QFile outFile("../OOP/PhoneBook/contacts.txt");
     if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)){
-        qDebug() << QFileInfo(outFile).absoluteFilePath() ;
         QTextStream stream(&outFile);
         QVectorIterator<Contact> it(_model->contacts());
 
@@ -87,6 +88,23 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_findPhoneInput_textChanged(const QString &phone)
 {
-    QModelIndex ind = _model->contactWithNumber(phone);
-    ui->contactNamesList->setCurrentIndex(_proxy->mapFromSource(ind));
+    QModelIndexList list = _model->contactsWithNumber(phone);
+    QItemSelectionModel* selectModel = new QItemSelectionModel(_proxy);
+    for(QModelIndex& ind: list) {
+        selectModel->select(_proxy->mapFromSource(ind),QItemSelectionModel::Select);
+    }
+
+
+    ui->contactNamesList->setSelectionModel(selectModel);
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QString name = ui->nameInput->text();
+    if(name.isEmpty()){
+        QMessageBox::warning(this,"Error", "Fill name form");
+        return;
+    }
+    _model->addContact(name);
+    ui->nameInput->clear();
 }

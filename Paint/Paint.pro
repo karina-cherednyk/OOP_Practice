@@ -17,11 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     canvas.cpp \
+    layermodel.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    Pair.h \
     canvas.h \
+    layermodel.h \
     mainwindow.h
 
 FORMS += \

@@ -196,7 +196,6 @@ void Canvas::setCurrentLayer(const QModelIndex(& ind))
 void Canvas::insertLayer(const QModelIndex &ind)
 {
     int pos = _layers.empty() ? 0 : ind.row()+1;
-    qDebug() << (pos);
     _layers.insert(pos,
                        Pair<QString,QImage>(
                        QString("Layer %0").arg(_c++),

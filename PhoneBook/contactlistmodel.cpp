@@ -64,12 +64,22 @@ const QVector<Contact> &ContactListModel::contacts() const
 
 }
 
-const QModelIndex &ContactListModel::contactWithNumber(const QString &num) const
+const QModelIndexList ContactListModel::contactsWithNumber(const QString &num) const
 {
+
+   QModelIndexList list;
+   if(num.isEmpty()) return list;
    for(int i=0; i<_contacts.size(); ++i){
-       if(_contacts.at(i).nums().contains(num)) return index(i);
+       if(_contacts.at(i).hasMatchingPhone(num)) list.append(index(i));
    }
-   return index(-1);
+   return list;
+}
+
+void ContactListModel::addContact(const Contact &c)
+{
+    beginInsertRows(QModelIndex(),rowCount(), rowCount());
+    _contacts.append(c);
+    endInsertRows();
 }
 
 bool ContactListModel::removeRows(int row, int count, const QModelIndex &parent)

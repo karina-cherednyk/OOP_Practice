@@ -94,7 +94,12 @@ void MainWindow::on_commitButton_clicked()
 
 void MainWindow::writeToBrowser(QTextStream &in)
 {
-    QString res = in.readAll();
+    QString res;
+    while (!in.atEnd()) {
+
+        res += in.read(1);
+    }
+
     fromText->setText(res);
     toText->setText(res.replace('\t',' ').remove('\n'));
 }

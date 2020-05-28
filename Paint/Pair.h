@@ -2,7 +2,9 @@
 #define PAIR_H
 
 #include <QPair>
-
+/**
+ *TODO: replace Pair with custom class for Layer(QString layerName, QImage image, bool isVisible)
+ */
 template <class T, class U>
 class Pair{
     T _first;

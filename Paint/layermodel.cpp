@@ -15,6 +15,11 @@ int LayerModel::rowCount(const QModelIndex &parent) const
 
 }
 
+/**
+ * returns QPair<layer name, layer image> that corresponds to changeable Pair
+ * TODO if you decide to add visible/hidden layer toggle button,
+ * replace QPair qith custom class, add QOBJECT_METATYPE(className) to pass data in QVariant
+ */
 QVariant LayerModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
@@ -24,42 +29,22 @@ QVariant LayerModel::data(const QModelIndex &index, int role) const
     return QVariant::fromValue<QPair<QString,QImage>>(pair);
 }
 
-
-
-Delegate::Delegate(QObject *p):QItemDelegate(p){}
-
-void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/**
+ * called when new layer name is set in delegate qLineEdit
+ */
+bool LayerModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    QPair<QString,QImage> l = index.data().value<QPair<QString,QImage>>();
-
-    QRect rect = option.rect;
-
-
-    int m = 5; //margin
-    QImage preview = l.second.scaled(QSize(rect.width()-2*m,rect.height()-20));
-    QRect frame(QPoint(rect.left()+m,rect.top()+m),preview.size());
-    painter->fillRect(frame, QPixmap(":/icons/background.png"));
-
-    if (option.state & QStyle::State_Selected) {
-        QImage select(rect.size(), QImage::Format_ARGB32);
-        select.fill(qRgba(12,79,166,64));
-        painter->drawImage(rect.topLeft(),select);
-    }
-
-     painter->drawImage(QPoint(rect.left()+m,rect.top()+m),preview);
-
-
-     QRect text(frame.bottomLeft(),rect.bottomRight());
-     painter->drawRect(frame);
-
-     painter->drawText(text,l.first);
-
-
-
-
+    (*_layers)[index.row()].first() = value.toString();
+    return true;
 }
 
-QSize Delegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+/**
+ * is called one time inside Canvas class to pass pointer to its own layers list
+ */
+void LayerModel::setLayersModel(QList<Pair<QString, QImage> > *layers)
 {
-    return QSize(156,130);
+    _layers = layers;
 }
+
+
+

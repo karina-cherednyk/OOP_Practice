@@ -34,46 +34,46 @@ MainWindow::MainWindow(QWidget *parent)
           ui->menu_Save_As->addAction(action);
       }
 
+    //main window only events
     connect(ui->actionOpen, SIGNAL(triggered()), SLOT(open()) );
     connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
     connect(ui->actionPen_color,SIGNAL(triggered()), SLOT(invokePenColorDialog()));
     connect(ui->actionPen_width,SIGNAL(triggered()), SLOT(invokePenWidthDialog()));
     connect(ui->actionClear_screen, SIGNAL(triggered()), &_canvas,SLOT(clearImage()));
 
+    //canvas redo/ undo actions
     connect(ui->actionRedo,SIGNAL(triggered()), &_canvas, SLOT(redo()));
     connect(ui->actionUndo,SIGNAL(triggered()), &_canvas, SLOT(undo()));
+    connect(&_canvas, SIGNAL(undoSignal(bool)), ui->actionUndo, SLOT(setEnabled(bool))); //when current save is first
+    connect(&_canvas, SIGNAL(redoSignal(bool)), ui->actionRedo, SLOT(setEnabled(bool))); //when current save is last
 
-
+    //canvas sets tool to paste
     connect(ui->actionCut, SIGNAL(triggered()), &_canvas, SLOT(cut()));
     connect(ui->actionCopy, SIGNAL(triggered()), &_canvas, SLOT(copy()));
     connect(ui->actionPaste, SIGNAL(triggered()), &_canvas, SLOT(paste()));
-
-
-    connect(&_canvas, SIGNAL(undoSignal(bool)), ui->actionUndo, SLOT(setEnabled(bool)));
-    connect(&_canvas, SIGNAL(redoSignal(bool)), ui->actionRedo, SLOT(setEnabled(bool)));
-
-    connect(&_canvas, SIGNAL(pasteSignal()),  SLOT(enablePaste()));
-    //
+    connect(&_canvas, SIGNAL(pasteSignal()),  SLOT(enablePaste())); //is called after area was selected with Cut or Copy
+    //disable when no area selected
     connect(&_canvas, SIGNAL(enableCutCopy(bool)), ui->actionCut, SLOT(setEnabled(bool)));
     connect(&_canvas, SIGNAL(enableCutCopy(bool)), ui->actionCopy, SLOT(setEnabled(bool)));
     connect(&_canvas, SIGNAL(enableCutCopy(bool)), ui->actionPaste, SLOT(setEnabled(bool)));
 
 
 
-    //add/ remove layout
+    // add/ remove layout
     QWidget* rightDockContainer = ui->rightDockWidget->widget();
     (rightDockContainer->findChild<QToolButton*>("addLayerButton"))->setDefaultAction(ui->actionAddLayer);
     (rightDockContainer->findChild<QToolButton*>("removeLayerButton"))->setDefaultAction(ui->actionRemoveLayer);
-
-
 
     layerList = rightDockContainer->findChild<QListView*>("layerList");
     layerList->setItemDelegate(new LayerDelegate(this));
     layerList->setModel(_canvas.getModel());
     layerList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    //change current Canvas::_image to draw on
     connect(layerList, SIGNAL(pressed(const QModelIndex&)),  &_canvas, SLOT(setCurrentLayer(const QModelIndex&)));
     layerList->setCurrentIndex(_canvas.getModel()->index(0));
+
+    //when layer is added deleted, next selection is determined insede Canvas class
     connect(&_canvas, SIGNAL(setSelected(const QModelIndex&)), layerList, SLOT(setCurrentIndex(const QModelIndex&)));
 
 
@@ -90,6 +90,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else event->ignore();
 }
 
+/**
+ * open save dialog when canvas was modified after last save
+ */
 bool MainWindow::requestSaving()
 {
     if(_canvas.isModified()){
@@ -105,6 +108,9 @@ bool MainWindow::requestSaving()
     return true;
 }
 
+/**
+ * save canvas current _image, after that Canvas::_modified == false
+ */
 bool MainWindow::save(const QByteArray &fileFormat)
 {
     QString initialPath = QDir::currentPath() + "/untitled." + fileFormat;
@@ -124,7 +130,7 @@ bool MainWindow::save(const QByteArray &fileFormat)
 
 void MainWindow::open()
 {
-    if(requestSaving()){
+    if(requestSaving()){ //save image before open next one
         QString fileName = QFileDialog::getOpenFileName(this, "Open file", QDir::currentPath());
         if(!fileName.isEmpty()) _canvas.openImage(fileName);
     }
@@ -145,10 +151,6 @@ void MainWindow::invokePenWidthDialog()
 
    if(ok) _canvas.setPenWidth(newWidth);
 }
-
-
-
-
 
 void MainWindow::on_actionBrush_triggered()
 {
@@ -195,10 +197,6 @@ void MainWindow::on_actionColorpicker_triggered()
     _canvas.setTool(Canvas::ColorPicker);
 }
 
-
-
-
-
 void MainWindow::on_actionRemoveLayer_triggered()
 {
     const QModelIndex& selected = layerList->selectionModel()->currentIndex();
@@ -207,7 +205,6 @@ void MainWindow::on_actionRemoveLayer_triggered()
 
 void MainWindow::on_actionAddLayer_triggered()
 {
-
     const QModelIndex& selected = layerList->selectionModel()->currentIndex();
     _canvas.insertLayer(selected);
 }

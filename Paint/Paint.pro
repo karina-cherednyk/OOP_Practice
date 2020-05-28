@@ -27,7 +27,8 @@ HEADERS += \
     canvas.h \
     layerdelegate.h \
     layermodel.h \
-    mainwindow.h
+    mainwindow.h \
+    rotateevent.h
 
 FORMS += \
     canvas.ui \

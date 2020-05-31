@@ -10,7 +10,7 @@
 
 class SelectEvent: public ShapeEvent
 {
-    enum SelectionMode{ Left, Right, Top, Bottom, Move,None };
+    enum SelectionMode{ Left=1, Right=2, Top=4, Bottom=8, TL=5, TR=6, BL=9, BR=10, Move,None }; //T - Top, B - Bottom e.t.c.
     QPoint _lastPoint;
     SelectionMode _mode;
     QRect _bufferedRect;
@@ -22,6 +22,9 @@ class SelectEvent: public ShapeEvent
 public:
     inline SelectEvent(QWidget* w):ShapeEvent(w),_mode(None),_isVisible(false),_selectionFinished(false){}
 
+    /**
+     * move selected area relatively to cursor
+     */
     inline void moveWorkingRectTo(QPoint p){
 
         int dx = _bufferedRect.left() - _lastPoint.x();
@@ -36,23 +39,37 @@ public:
     inline void setImage(const QImage& im){
         _bufferedImage = im;
     }
-
+    /**
+     * was area selected (do you need to select rect first or now you have to trasnform it )
+     */
     inline bool isFinished(){
         return _selectionFinished;
     }
+    /**
+     * used when Select button is toggled
+     */
     inline void removeSelection(){
         _isVisible = false;
     }
+    /**
+     * will selected rect be displayed on canvas
+     */
     inline bool hasSelection(){
         return _isVisible;
     }
     inline const QRect& getBufferedRect(){
         return _bufferedRect;
     }
-
+    /**
+     * what step is it? (true - select rect; false - transform it)
+     */
     inline bool isNoneMode(){
         return _mode == None;
     }
+    /**
+     * as default mode is None (modified image not shown),
+     * sets mode to smthn else to make image be drawn on canvas
+     */
     inline void enablePaste(){
         _mode = Move;
     }

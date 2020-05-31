@@ -32,7 +32,7 @@ Canvas::Canvas(QWidget *parent) :
 
 }
 
-//TODO _bufferedImage is never drawn with Rotate tool
+
 void Canvas::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -48,7 +48,7 @@ void Canvas::paintEvent(QPaintEvent *event)
         painter.translate(_rotation.center());
         painter.rotate(_rotation.angle());
         QPoint origin = _rotation.getAfterTransformOriginPoint();
-        painter.drawImage(origin, _selection.getTransformedImage()); //TODO is never drawn
+        painter.drawImage(origin, _selection.getTransformedImage());
         painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
         painter.drawRect(QRect(origin, _rotation.getRotatingRect().size()));
     }

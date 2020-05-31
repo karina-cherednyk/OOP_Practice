@@ -2,24 +2,55 @@
 #include "selectevent.h"
 #include <QDebug>
 
+bool pass(int a, int b){
+    return qAbs(a-b) < 5;
+}
+bool mid(int a, int m, int b){
+    return a<=m && m<=b;
+}
+/**
+ * does user want to transform selection?
+ * if so, then assign appropriate mode
+ */
 bool SelectEvent::possiblySetSelectionMode(QPoint pos)
 {
-    if(qAbs(pos.x()-_workingRect.right()) <5 && _workingRect.top()<= pos.y() && _workingRect.bottom() >= pos.y()){
-        _widget->setCursor(Qt::SizeHorCursor);
-        _mode = Right;
+    const QRect& wr = _workingRect;
+    if(pass(pos.x(),wr.right()) && mid(wr.top(),pos.y(),wr.bottom())){
+        if(pass(pos.y(), wr.top())){
+            _widget->setCursor(Qt::SizeBDiagCursor);
+            _mode = TR;
+        }
+        else if(pass(pos.y(),wr.bottom())){
+            _widget->setCursor(Qt::SizeFDiagCursor);
+            _mode = TR;
+        }
+        else {
+            _widget->setCursor(Qt::SizeHorCursor);
+            _mode = Right;
+        }
         return true;
     }
-    else if(qAbs(pos.x()-_workingRect.left()) <5  && _workingRect.top()<= pos.y() && _workingRect.bottom() >= pos.y()){
-         _widget->setCursor(Qt::SizeHorCursor);
-        _mode = Left;
+    else if(pass(pos.x(),wr.left()) && mid(wr.top(),pos.y(),wr.bottom())){
+        if(pass(pos.y(), wr.top())){
+            _widget->setCursor(Qt::SizeFDiagCursor);
+            _mode = TL;
+        }
+        else if(pass(pos.y(),wr.bottom())){
+            _widget->setCursor(Qt::SizeBDiagCursor);
+            _mode = TL;
+        }
+        else {
+            _widget->setCursor(Qt::SizeHorCursor);
+            _mode = Left;
+        }
         return true;
     }
-    else if(qAbs(pos.y()-_workingRect.bottom()) <5  && _workingRect.left()<= pos.x() && _workingRect.right() >= pos.x()){
+    else if(pass(pos.y(),wr.bottom()) && mid(wr.left(),pos.x(),wr.right())){
         _widget->setCursor(Qt::SizeVerCursor);
         _mode = Bottom;
         return true;
     }
-    else if(qAbs(pos.y()-_workingRect.top()) <5  && _workingRect.left()<= pos.x() && _workingRect.right() >= pos.x()){
+    else if(pass(pos.y(),wr.top()) && mid(wr.left(),pos.x(),wr.right())){
          _widget->setCursor(Qt::SizeVerCursor);
         _mode = Top;
         return true;
@@ -33,22 +64,24 @@ bool SelectEvent::possiblySetSelectionMode(QPoint pos)
     return false;
 }
 
-
+/**
+ * try to resize rect according to mode
+ */
 bool SelectEvent::possiblyResizeSelectionRect(QPoint pos)
 {
-     if(_mode == Right) {
+    if(_mode & Right) {
         if(pos.x()<=_bufferedRect.left()) return false;
         _workingRect.setRight(pos.x());
     }
-    else if(_mode == Left) {
+    if(_mode & Left) {
          if(pos.x()>=_bufferedRect.right() ) return false;
         _workingRect.setLeft(pos.x());
     }
-    else if(_mode == Top) {
+    if(_mode & Top) {
          if(pos.y()>=_bufferedRect.bottom() ) return false;
         _workingRect.setTop(pos.y());
     }
-    else if(_mode == Bottom) {
+    if(_mode & Bottom) {
          if(pos.y()<=_bufferedRect.top() ) return false;
         _workingRect.setBottom(pos.y());
 
@@ -60,7 +93,7 @@ void SelectEvent::processPress(QPoint p){
     _selectionFinished = false;
 
     _lastPoint = p;
-
+    //is selection rect visible? & user wants to interact with it
     if(hasSelection() && possiblySetSelectionMode(p))return;
      _isVisible = true;
     _mode = None;

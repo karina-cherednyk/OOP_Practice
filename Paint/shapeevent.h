@@ -13,6 +13,10 @@ protected:
 
 
    bool possiblySetSelectionMode(QPoint pos);
+
+   /**
+    * set bottomRight coord
+    */
    inline void resizeWorkingRectTo(QPoint p){
 
        const QPoint& topLeft = _workingRect.topLeft();
@@ -32,15 +36,12 @@ public:
     }
     inline virtual void processMove(QPoint p){
         _updateRect = _workingRect;
-
         resizeWorkingRectTo(p);
-         //update
         (_updateRect |= _workingRect).adjust(-3, -3, +3, +3);
     }
     inline virtual void processRelease()
     {
          _widget->setCursor(Qt::ArrowCursor);
-        //update
         _updateRect = _workingRect.adjusted(-3, -3, +3, +3);
 
     }

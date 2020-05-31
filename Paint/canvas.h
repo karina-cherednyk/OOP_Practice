@@ -4,6 +4,7 @@
 #include "Pair.h"
 #include "layermodel.h"
 #include "rotateevent.h"
+#include "selectevent.h"
 
 #include <QWidget>
 
@@ -14,7 +15,8 @@ class Canvas;
 class Canvas : public QWidget
 {
     Q_OBJECT
-
+    QCursor _ACWCursor;
+    QCursor _CWCursor;
 
 public:
     enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Spray, ColorPicker, Rotate };
@@ -70,14 +72,13 @@ private:
     Ui::Canvas *ui;
     void drawLineTo(const QPoint& p);
     void drawSelectionSquareTo(const QPoint& p);
-    void resizeImage(QImage* image, const QSize &newSize);
+    void resizeCanvas(QImage* image, const QSize &newSize);
     void saveState();
     void fill(QPoint pos);
-    bool hasSelectedArea();
-    bool hasBufferedArea();
     void drawSpray(QPoint pos);
     void pickColor(QPoint pos);
     void prepareForRotation(QPoint pos);
+    void prepareForShapeChange(ShapeEvent& e, QPoint p);
     bool resizeSelectionArea(QPoint pos);
     bool setSelectionMode(QPoint pos);
     void pasteImage(QPoint pos);
@@ -85,7 +86,7 @@ private:
 
 
 
-    enum SelectionMode{ Left, Right, Top, Bottom, Move,None }; //for Selection tool area transformations
+
 
     LayerModel _model; //model for layerList
     int _c; //counts how many layers were created from the start, used to give name to new layer
@@ -95,19 +96,18 @@ private:
     int _curSave; //index of curent save in _saves
     int _lastAvailableSave; //as data in saves is often rewritten, holds index of last possible save image, is used in redo action
 
-    QRect* _selectionRect; // 1st step - select area, _bufferedRect = _selectionRect; 2nd step - resize/ move area
-    QRect* _bufferedRect; // == _selectionRect before resizing
-    QImage* _bufferedImage; // == _bufferedRect area of image
-    bool _selectionFinished; // when area is selected, 2nd stage - move and resize it
+
 
     QImage* _image; // current drawing layer
     QList<Pair<QString,QImage>> _layers; // all drawing layers
     RotateEvent _rotation; //for Rotate tool
+    SelectEvent _selection; // for Select tool
+    ShapeEvent _shape;
 
     QColor _penColor;
     int _penWidth;
     Tool _tool;
-    SelectionMode _selectionMode;
+
 };
 
 #endif // CANVAS_H

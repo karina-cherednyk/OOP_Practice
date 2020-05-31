@@ -4,6 +4,7 @@
 #include <QLine>
 #include <QPoint>
 #include <QRect>
+#include <QWidget>
 
 /**
  * Used when rotationEvent is triggered in Canvas class
@@ -35,7 +36,6 @@ class RotateEvent
    }
 
 public:
-
 
     /**
      * angle between vectors

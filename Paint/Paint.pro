@@ -20,7 +20,8 @@ SOURCES += \
     layerdelegate.cpp \
     layermodel.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    selectevent.cpp
 
 HEADERS += \
     Pair.h \
@@ -28,7 +29,9 @@ HEADERS += \
     layerdelegate.h \
     layermodel.h \
     mainwindow.h \
-    rotateevent.h
+    rotateevent.h \
+    selectevent.h \
+    shapeevent.h
 
 FORMS += \
     canvas.ui \

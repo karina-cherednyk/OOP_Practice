@@ -23,19 +23,15 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    inline bool setData(const QModelIndex &index, const QVariant &value, int role=Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role=Qt::EditRole) override;
 
 
     inline Qt::ItemFlags flags(const QModelIndex &index) const override {
         return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
 
-    /**
-     * is called one time inside Canvas class to pass pointer to its own layers list
-     */
-    inline void setLayersModel(QList<Pair<QString,QImage>>* layers){
-        _layers = layers;
-    }
+
+    void setLayersModel(QList<Pair<QString,QImage>>* layers);
 
     inline bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override{
         beginInsertRows(parent, row, row+count-1);

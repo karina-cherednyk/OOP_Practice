@@ -13,7 +13,7 @@ Canvas::Canvas(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),_penWidth(1),_penColor(Qt::black),
     _modified(false),_curSave(0),_lastAvailableSave(0),
-    _tool(Pen),_selectionFinished(false), _selectionMode(None),_model(this),_c(1)
+    _tool(Pen),_model(this),_c(1),_selection(this),_shape(this),_CWCursor(QPixmap(":/icons/cw.png")),_ACWCursor(QPixmap(":/icons/acw.png"))
 {
     ui->setupUi(this);
 
@@ -25,10 +25,11 @@ Canvas::Canvas(QWidget *parent) :
     _image = &_layers[0].second();
 
     _saves.append(QPair<QImage*,QImage>(_image,*_image));
-    _selectionRect = nullptr;
-    _bufferedRect = nullptr;
+
 
      setFocusPolicy(Qt::StrongFocus);
+
+
 }
 
 //TODO _bufferedImage is never drawn with Rotate tool
@@ -47,17 +48,23 @@ void Canvas::paintEvent(QPaintEvent *event)
         painter.translate(_rotation.center());
         painter.rotate(_rotation.angle());
         QPoint origin = _rotation.getAfterTransformOriginPoint();
-        painter.drawImage(origin, *_bufferedImage); //TODO is never drawn
+        painter.drawImage(origin, _selection.getTransformedImage()); //TODO is never drawn
         painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
         painter.drawRect(QRect(origin, _rotation.getRotatingRect().size()));
     }
-    else if(hasSelectedArea()){
-        if(_tool == Rectangle || _tool == Ellipse) painter.setPen(QPen(_penColor,_penWidth));
-        else if(_selectionFinished) painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
-        else  painter.setPen(QPen(Qt::black,2,Qt::DashDotLine));
-        if(_tool == Ellipse) painter.drawEllipse(*_selectionRect);
-        else painter.drawRect(*_selectionRect);
+    else if(_tool == Rectangle || _tool == Ellipse){
+        painter.setPen(QPen(getToolColor(),_penWidth));
+        if(_tool == Rectangle) painter.drawRect(_shape.getWorkingRect());
+        else  painter.drawEllipse(_shape.getWorkingRect());
     }
+    else if(_selection.hasSelection()){
+        if(_selection.isFinished())
+            painter.setPen(QPen(Qt::black,2,Qt::DashDotLine));
+        else  painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
+        if(!_selection.isNoneMode()) painter.drawImage(_selection.getWorkingRect(),_selection.getTransformedImage());
+        painter.drawRect(_selection.getWorkingRect());
+    }
+
 }
 
 
@@ -69,7 +76,7 @@ bool Canvas::openImage(const QString &fileName)
           return false;
 
       QSize newSize = loadedImage.size().expandedTo(size());
-      resizeImage(&loadedImage, newSize);
+      resizeCanvas(&loadedImage, newSize);
       *_image = loadedImage;
       _modified = false;
       update();
@@ -79,7 +86,7 @@ bool Canvas::openImage(const QString &fileName)
 bool Canvas::saveImage(const QString &fileName, const char *fileFormat)
 {
     QImage savingImage = *_image;
-    resizeImage(&savingImage, size());
+    resizeCanvas(&savingImage, size());
 
     if(savingImage.save(fileName, fileFormat)){
 
@@ -92,12 +99,23 @@ bool Canvas::saveImage(const QString &fileName, const char *fileFormat)
 
 void Canvas::setTool(const Canvas::Tool &t)
 {
+    //toggle selection
     if(_tool == Select && t == Select){
-        _selectionRect = nullptr;
-        update( (*_bufferedRect).adjusted(-3,-3,3,3));
+        _selection.removeSelection();
+        update( _selection.getWorkingRect().adjusted(-3,-3,3,3));
     }
-    else emit enableCutCopy(false);
+    //currents selected area may be modified, so save new image in area
+    if(_selection.hasSelection()) {
+        _selection.setImage(_image->copy(_selection.getWorkingRect()));
+    }
+    if(_tool == Rotate){
+        _tool = t;
+        update(_rotation.getUpdateRect());
+    }
+
     _tool = t;
+
+
 }
 
 
@@ -127,18 +145,21 @@ void Canvas::undo()
 
 
 }
+void clearArea(QImage& image, const QRect& area){
+    QPainter painter(&image);
+    painter.setCompositionMode(QPainter::CompositionMode_Clear);
+    painter.fillRect(area, Qt::transparent);
+}
 
 void Canvas::cut()
 {
 
-    if(_selectionRect){
-
-        QPainter painter(_image);
-        painter.fillRect(*_selectionRect, Qt::white);
-        update(*_selectionRect);
+    if(_selection.hasSelection()){
+        _selection.setImage(_image->copy(_selection.getWorkingRect()));
+        clearArea(*_image, _selection.getWorkingRect());
+        update(_selection.getUpdateRect());
         saveState();
         emit pasteSignal();
-        setTool(Paste);
     }
 
 }
@@ -183,41 +204,7 @@ void Canvas::removeLayer(const QModelIndex &ind)
 
 }
 
-bool Canvas::resizeSelectionArea(QPoint pos)
-{
-    if(_selectionMode == Move){
-        int dx = _bufferedRect->left() - _lastPoint.x();
-        int dy = _bufferedRect->top()  - _lastPoint.y();
-        _selectionRect->moveTo(pos.x()+dx, pos.y()+dy);
-    }
-    else if(_selectionMode == Right) {
-        if(pos.x()<=_bufferedRect->left() ) return false;
-        _selectionRect->setRight(pos.x());
-    }
-    else if(_selectionMode == Left) {
-         if(pos.x()>=_bufferedRect->right() ) return false;
-        _selectionRect->setLeft(pos.x());
-    }
-    else if(_selectionMode == Top) {
-         if(pos.y()>=_bufferedRect->bottom() ) return false;
-        _selectionRect->setTop(pos.y());
-    }
-    else if(_selectionMode == Bottom) {
-         if(pos.y()<=_bufferedRect->top() ) return false;
-        _selectionRect->setBottom(pos.y());
 
-    }
-    return true;
-}
-
-void replaceSelectionArea(QImage* prevImage,QImage* image, QRect* prev, QRect* next){
-    *image = *prevImage;
-    QPainter painter(image);
-    painter.save();
-    painter.setCompositionMode(QPainter::CompositionMode_Clear);
-    painter.fillRect(*prev,Qt::transparent); painter.restore();
-    painter.drawImage(*next, *prevImage, *prev);
-}
 
 
 //TODO add 4 cursors for rotation;
@@ -229,69 +216,44 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     else if(_tool == Spray) drawSpray(p);
     else if(_tool == Rotate) {
         _rotation.setEnd(p);
+         double angle = _rotation.angle();
+         if(angle<180) setCursor(_CWCursor);
+         else setCursor(_ACWCursor);
         update(_rotation.getUpdateRect());
     }
-    else if(_tool == Select || _tool == Paste || _tool == Rectangle || _tool == Ellipse) {
-
-        if( _selectionMode == None) { drawSelectionSquareTo(p); return; }
-        if(!resizeSelectionArea(p)) return;
-        replaceSelectionArea(_bufferedImage,_image,_bufferedRect,_selectionRect);
-        update();
-
+    else if(_tool == Select ) {
+        _selection.processMove(p);
+        update(_selection.getUpdateRect());
+    }
+    else if(_tool == Rectangle || _tool == Ellipse) {
+        _shape.processMove(p);
+        update(_shape.getUpdateRect());
     }
 
 
 }
-void clearArea(QImage& image, const QRect& area){
-    QPainter painter(&image);
-    painter.setCompositionMode(QPainter::CompositionMode_Clear);
-    painter.fillRect(area, Qt::transparent);
-}
-bool Canvas::setSelectionMode(QPoint pos){
-    if(qAbs(pos.x()-_selectionRect->right()) <5){
-        setCursor(Qt::SizeHorCursor);
-        _selectionMode = Right;
-        return true;
-    }
-    else if(qAbs(pos.x()-_selectionRect->left()) <5){
-        setCursor(Qt::SizeHorCursor);
-        _selectionMode = Left;
-        return true;
-    }
-    else if(qAbs(pos.y()-_selectionRect->bottom()) <5){
-        setCursor(Qt::SizeVerCursor);
-        _selectionMode = Bottom;
-        return true;
-    }
-    else if(qAbs(pos.y()-_selectionRect->top()) <5){
-        setCursor(Qt::SizeVerCursor);
-        _selectionMode = Top;
-        return true;
-    }
-    else if(_selectionRect->contains(pos)){
-        setCursor(Qt::SizeAllCursor);
-        _selectionMode = Move;
-        _lastPoint = pos;
-        return true;
-    }
-    return false;
-}
+
 
 void Canvas::pasteImage(QPoint pos)
 {
-    if(!hasBufferedArea()) return ;
-    QPainter painter(_image);
-    QRect updateRect = QRect(pos,_bufferedRect->size());
-    painter.drawImage(updateRect, *_bufferedImage, *_bufferedRect);
-    _selectionRect = new QRect(updateRect.topLeft(), updateRect.size());
+    _selection.setSelectionRect(QRect(pos,_selection.getWorkingRect().size()));
     _tool = Select;
+    _selection.enablePaste();
+    update(_selection.getUpdateRect());
 }
 void Canvas::prepareForRotation(QPoint pos)
 {
-    _rotation.setRotatingRect(*_selectionRect);
-    _rotation.setCenter(_selectionRect->center());
+    const QRect& selected = _selection.getWorkingRect();
+    _rotation.setRotatingRect(selected);
+    _rotation.setCenter(selected.center());
     _rotation.setBegin(pos);
-     clearArea(*_image, *_bufferedRect);
+    clearArea(*_image, selected);
+}
+
+void Canvas::prepareForShapeChange(ShapeEvent &e, QPoint p)
+{
+    e.processPress(p);
+    update(e.getUpdateRect());
 }
 
 void Canvas::mousePressEvent(QMouseEvent *event)
@@ -303,71 +265,55 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     else if(_tool == Bucket) fill(p);
     else if(_tool == Rotate) prepareForRotation(p);
     else if(_tool == Paste) pasteImage(p);
-    if(_tool == Select || _tool == Rectangle || _tool == Ellipse) {
-         _selectionFinished = false;
+    else if(_tool == Select )   {
 
-        if(hasSelectedArea()){
-            if(setSelectionMode(p)) return;
-            else {
-                _selectionMode = None;
-                QRect updateRect = (*_selectionRect ).adjusted(-3, -3, +3, +3);
-                delete _selectionRect;
-                _selectionRect = nullptr;
-                update(updateRect);
-            }
+        _selection.processPress(p);
+        if(!_selection.isNoneMode()){
+            clearArea(*_image, _selection.getBufferedRect());
         }
-        _selectionRect = new QRect(event->pos(), QSize(1,1));
-
+        update(_selection.getUpdateRect());
+        emit enableCutCopy(true);
     }
-
-    if(_tool == Select) emit enableCutCopy(true);
+    else if(_tool == Rectangle || _tool == Ellipse) prepareForShapeChange(_shape,p);
 
 }
-int getIndex(const QImage* im,  QList<Pair<QString,QImage>>&list){
-   for(int i=0; i<list.size(); ++i)
-       if(&(list[i].second()) == im) return i;
-   return -1;
-}
 
+
+int getIndex(const QImage* im,  QList<Pair<QString,QImage>>&list);
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 
     if(_tool == Select){
-        setCursor(Qt::ArrowCursor);
-        _selectionMode = None;
-        _selectionFinished = true;
-        if(hasBufferedArea()) {
-            delete _bufferedRect;
-            delete _bufferedImage;
-        }
-        _bufferedRect = new QRect(_selectionRect->topLeft(), _selectionRect->size());
-        _bufferedImage = new QImage(*_image);
-        update();
-        if(_selectionMode == None) return;
-    }
 
+       _selection.processRelease();
+       update(_selection.getUpdateRect());
+
+       if(!_selection.isNoneMode()){
+       QPainter painter(_image);
+       painter.drawImage(_selection.getWorkingRect(), _selection.getTransformedImage());
+       }
+       _selection.setImage(_image->copy(_selection.getWorkingRect()));
+
+
+    }
     else if(_tool == Rectangle || _tool == Ellipse){
+        _shape.processRelease();
+        update(_shape.getUpdateRect());
         QPainter painter(_image);
-        painter.setPen(QPen(_penColor,_penWidth));
-        if(_tool == Rectangle) painter.drawRect(*_selectionRect);
-        else  painter.drawEllipse(*_selectionRect);
-        update(_selectionRect->adjusted(-3,-3,3,3));
-        saveState();
-        delete _selectionRect;
-        _selectionRect = nullptr;
+        painter.setPen(QPen(getToolColor(),_penWidth));
+        if(_tool == Rectangle) painter.drawRect(_shape.getWorkingRect());
+        else painter.drawEllipse(_shape.getWorkingRect());
     }
-
     else if(_tool == Rotate){
         QPainter painter(_image);
         painter.translate(_rotation.center());
         painter.rotate(_rotation.angle());
         QPoint origin = _rotation.getAfterTransformOriginPoint();
-        painter.drawImage(origin, *_bufferedImage);
+        painter.drawImage(origin, _selection.getTransformedImage());
+        setCursor(Qt::ArrowCursor);
     }
 
-    if(_tool!= Select && _tool != ColorPicker) saveState();
-    int curInd = getIndex(_image,_layers); assert(curInd!=-1);
-    const QModelIndex& changed = _model.index(curInd);
-    _model.dataChanged(changed, changed);
+    if( _tool != ColorPicker) saveState();
+
 }
 
 
@@ -388,6 +334,10 @@ void Canvas::saveState()
     emit redoSignal(false);
 
     _modified = true;
+
+    int curInd = getIndex(_image,_layers); assert(curInd!=-1);
+    const QModelIndex& changed = _model.index(curInd);
+    _model.dataChanged(changed, changed);
 }
 
 
@@ -397,7 +347,7 @@ void Canvas::resizeEvent(QResizeEvent *event)
     if (width() > _image->width() || height() > _image->height()) {
         int newWidth = qMax(width() + 128, _image->width());
         int newHeight = qMax(height() + 128, _image->height());
-        resizeImage(_image, QSize(newWidth, newHeight));
+        resizeCanvas(_image, QSize(newWidth, newHeight));
         update();
     }
        QWidget::resizeEvent(event);
@@ -407,7 +357,7 @@ void Canvas::drawLineTo(const QPoint &nextPoint)
 {
 
     QPainter painter(_image);
-    if(hasSelectedArea()) painter.setClipRect(*_selectionRect);
+    if(_selection.hasSelection()) painter.setClipRect(_selection.getWorkingRect());
     if(_tool == Eraser) painter.setCompositionMode(QPainter::CompositionMode_Clear);
     painter.setPen(QPen(getToolColor(),_penWidth));
     painter.drawLine(_lastPoint,nextPoint);
@@ -420,21 +370,9 @@ void Canvas::drawLineTo(const QPoint &nextPoint)
     _lastPoint = nextPoint;
 }
 
-void Canvas::drawSelectionSquareTo(const QPoint &p)
-{
-    const QPoint& topLeft = _selectionRect->topLeft();
-    if(p.x() < topLeft.x() || p.y() < topLeft.y()) return ;
-
-    QRect prev = *_selectionRect;
-    _selectionRect->setBottomRight(p);
 
 
-    update((prev | *_selectionRect)
-              .adjusted(-3, -3, +3, +3));
-
-}
-
-void Canvas::resizeImage(QImage *image, const QSize &newSize)
+void Canvas::resizeCanvas(QImage *image, const QSize &newSize)
 {
     if(image->size() == newSize) return;
 
@@ -452,13 +390,14 @@ void Canvas::fill(QPoint pos){
     QStack<QPoint> stack;
     stack.push(pos);
 
-    int minX, maxX, minY, maxY;
-    if(hasSelectedArea()){
-        minX = _selectionRect->left(); maxX = _selectionRect->right()-1;
-        minY = _selectionRect->top(); maxY = _selectionRect->bottom()-1;
-    }else {
-        minX = 0; maxX = _image->width()-1;
-        minY = 0; maxY = _image->height()-1;
+    int minX(0), maxX(_image->width()-1), minY(0), maxY(_image->height()-1);
+
+    if(_selection.hasSelection()){
+        const QRect& boundaries = _selection.getWorkingRect();
+        minX = qMax(minX,boundaries.left());
+        maxX = qMin(maxX,boundaries.right()-1);
+        minY = qMax(minY,boundaries.top());
+        maxY = qMin(maxY,boundaries.bottom()-1);
     }
 
     while(!stack.empty()){
@@ -477,10 +416,10 @@ void Canvas::fill(QPoint pos){
 void Canvas::drawSpray(QPoint pos)
 {
     QPainter painter(_image);
-    if(hasSelectedArea()) painter.setClipRect(*_selectionRect);
+    if(_selection.hasSelection()) painter.setClipRect(_selection.getWorkingRect());
 
     painter.setPen(QPen(_penColor,_penWidth/4));
-    int num = qrand() % 10;
+    int num = qrand() % 30;
 
     int x = pos.x(), y = pos.y();
     for(int i=0; i<num; ++i){
@@ -500,19 +439,12 @@ QColor Canvas::getToolColor()
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_T && _tool == Select && hasSelectedArea())     setTool(Rotate);
-    else if(event->key() == Qt::Key_T && _tool == Rotate) setTool(Select);
-    qDebug() << (_tool == Rotate);
-}
-bool Canvas::hasSelectedArea()
-{
-    return _selectionRect;
+    if(event->key() != Qt::Key_T) return;
+    if(_tool == Rotate)  setTool(Select);
+    else if( _selection.hasSelection()) setTool(Rotate);
+
 }
 
-bool Canvas::hasBufferedArea()
-{
-    return _bufferedRect;
-}
 LayerModel *Canvas::getModel()
 {
     return &_model;
@@ -523,8 +455,6 @@ void Canvas::pickColor(QPoint pos){
 }
 Canvas::~Canvas()
 {
-    delete _selectionRect;
-    delete _bufferedImage;
     delete ui;
 }
 
@@ -553,9 +483,9 @@ void Canvas::setPenWidth(int width)
 }
 void Canvas::copy()
 {
-     if(_selectionRect){
+     if(_selection.hasSelection()){
+         _selection.setImage(_image->copy(_selection.getWorkingRect()));
          emit pasteSignal();
-         setTool(Paste);
      }
 }
 
@@ -570,4 +500,9 @@ void Canvas::clearImage()
     _modified = true;
     saveState();
     update();
+}
+int getIndex(const QImage* im,  QList<Pair<QString,QImage>>&list){
+   for(int i=0; i<list.size(); ++i)
+       if(&(list[i].second()) == im) return i;
+   return -1;
 }

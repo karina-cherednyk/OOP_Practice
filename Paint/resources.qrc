@@ -25,5 +25,7 @@
         <file>icons/background.png</file>
         <file>icons/minus.png</file>
         <file>icons/plus.png</file>
+        <file>icons/acw.png</file>
+        <file>icons/cw.png</file>
     </qresource>
 </RCC>

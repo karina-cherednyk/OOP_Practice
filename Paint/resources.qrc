@@ -27,5 +27,6 @@
         <file>icons/plus.png</file>
         <file>icons/acw.png</file>
         <file>icons/cw.png</file>
+        <file>stylesheets/Aqua.qss</file>
     </qresource>
 </RCC>

@@ -84,10 +84,17 @@ border: 1px solid grey</string>
     <addaction name="actionEllipse"/>
     <addaction name="actionSpray"/>
    </widget>
+   <widget class="QMenu" name="menuFilters">
+    <property name="title">
+     <string>Filters</string>
+    </property>
+    <addaction name="actionBrightness"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOption"/>
    <addaction name="menuEdit"/>
    <addaction name="menuTools"/>
+   <addaction name="menuFilters"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -375,6 +382,11 @@ border: 1px solid grey</string>
    </property>
    <property name="text">
     <string>Remove Layer</string>
+   </property>
+  </action>
+  <action name="actionBrightness">
+   <property name="text">
+    <string>Brightness</string>
    </property>
   </action>
  </widget>

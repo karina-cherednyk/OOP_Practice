@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QColorDialog>
 #include <QInputDialog>
+#include "filterform.h"
 #include "layerdelegate.h"
 #include "layermodel.h"
 #include <QModelIndex>
@@ -207,4 +208,10 @@ void MainWindow::on_actionAddLayer_triggered()
 {
     const QModelIndex& selected = layerList->selectionModel()->currentIndex();
     _canvas.insertLayer(selected);
+}
+
+void MainWindow::on_actionBrightness_triggered()
+{
+    FilterForm* f = new FilterForm(_canvas.getResImage(),this);
+    f->show();
 }

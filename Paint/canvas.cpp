@@ -83,9 +83,22 @@ bool Canvas::openImage(const QString &fileName)
       return true;
 }
 
+QImage Canvas::getResImage()
+{
+    QImage res = QImage(_image->size(), QImage::Format_ARGB32);
+    res.fill(Qt::transparent);
+    QPainter p(&res);
+    QPoint o(0,0);
+     for(int i=0; i<_layers.size();++i){
+        p.drawImage(o,_layers[i].second());
+     }
+     return res;
+}
+
+
 bool Canvas::saveImage(const QString &fileName, const char *fileFormat)
 {
-    QImage savingImage = *_image;
+    QImage savingImage = getResImage();
     resizeCanvas(&savingImage, size());
 
     if(savingImage.save(fileName, fileFormat)){

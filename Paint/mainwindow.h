@@ -50,5 +50,6 @@ private slots:
 
     void on_actionRemoveLayer_triggered();
     void on_actionAddLayer_triggered();
+    void on_actionBrightness_triggered();
 };
 #endif // MAINWINDOW_H

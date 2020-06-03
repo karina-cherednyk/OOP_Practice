@@ -34,6 +34,7 @@ public:
     void setPenColor(const QColor& color);
     void setPenWidth(int width);
     void setTool(const Tool& t);
+    QImage getResImage();
 
 
 public slots:

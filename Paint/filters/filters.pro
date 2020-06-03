@@ -16,35 +16,36 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    canvas.cpp \
-    filterform.cpp \
-    layerdelegate.cpp \
-    layermodel.cpp \
+    afilter.cpp \
+    blackandwhitefilter.cpp \
+    brightnessfilter.cpp \
+    contrastfilter.cpp \
+    gaussianblur.cpp \
+    grayfilter.cpp \
     main.cpp \
-    mainwindow.cpp \
-    selectevent.cpp
+    negativefilter.cpp \
+    noisefilter.cpp \
+    peronmalikblur.cpp \
+    rgbafilter.cpp \
+    sepiafilter.cpp
 
 HEADERS += \
-    Pair.h \
-    canvas.h \
-    filterform.h \
-    layerdelegate.h \
-    layermodel.h \
-    mainwindow.h \
-    rotateevent.h \
-    samplewidget.h \
-    selectevent.h \
-    shapeevent.h
+    afilter.h \
+    blackandwhitefilter.h \
+    brightnessfilter.h \
+    contrastfilter.h \
+    gaussianblur.h \
+    grayfilter.h \
+    negativefilter.h \
+    noisefilter.h \
+    peronmalikblur.h \
+    rgbafilter.h \
+    sepiafilter.h
 
 FORMS += \
-    canvas.ui \
-    filterform.ui \
     mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-RESOURCES += \
-    resources.qrc

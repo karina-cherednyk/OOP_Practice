@@ -8,13 +8,14 @@
 #include <QIntValidator>
 #include <QFormLayout>
 #include <filters/afilter.h>
+#include <QDialog>
 #include <QPainter>
 
 namespace Ui {
 class FilterForm;
 }
 
-class FilterForm : public QWidget
+class FilterForm : public QDialog
 {
     Q_OBJECT
     AFilter* _filter;
@@ -29,15 +30,11 @@ public:
     ~FilterForm();
 signals:
     void addImage(const QString&, const QImage&);
+
 private slots:
 
-
     void on_tryButton_clicked();
-
-
-
     void on_cancelButton_clicked();
-
     void on_confirmButton_clicked();
 
 private:

@@ -24,6 +24,10 @@ SOURCES += \
     filters/contrastfilter.cpp \
     filters/grayfilter.cpp \
     filters/negativefilter.cpp \
+    filters/noisefilter.cpp \
+    filters/peronmalikblur.cpp \
+    filters/rgbafilter.cpp \
+    filters/sepiafilter.cpp \
     layerdelegate.cpp \
     layermodel.cpp \
     main.cpp \
@@ -40,6 +44,10 @@ HEADERS += \
     filters/contrastfilter.h \
     filters/grayfilter.h \
     filters/negativefilter.h \
+    filters/noisefilter.h \
+    filters/peronmalikblur.h \
+    filters/rgbafilter.h \
+    filters/sepiafilter.h \
     layerdelegate.h \
     layermodel.h \
     mainwindow.h \

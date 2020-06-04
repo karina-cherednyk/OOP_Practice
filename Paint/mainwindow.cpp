@@ -19,6 +19,10 @@
 #include <filters/contrastfilter.h>
 #include <filters/grayfilter.h>
 #include <filters/negativefilter.h>
+#include <filters/noisefilter.h>
+#include <filters/peronmalikblur.h>
+#include <filters/rgbafilter.h>
+#include <filters/sepiafilter.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -218,19 +222,13 @@ void MainWindow::on_actionAddLayer_triggered()
     _canvas.insertLayer(selected);
 }
 
-void MainWindow::enable()
-{
-    setEnabled(true);
-}
-
 void MainWindow::showFilterForm(AFilter *filter)
 {
-    FilterForm* f = new FilterForm(filter, _canvas.getResImage(),this);
+    FilterForm f(filter, _canvas.getResImage(),this);
+    connect(&f, SIGNAL(addImage(const QString&, const QImage&)), &_canvas, SLOT(addImage(const QString&, const QImage&)));
 
-    setEnabled(false);
-    f->show();
-    connect(f, SIGNAL(hide()), SLOT(enable()));
-    connect(f, SIGNAL(addImage(const QString&, const QImage&)), &_canvas, SLOT(addImage(const QString&, const QImage&)));
+    f.exec();
+
 }
 
 void MainWindow::on_actionBrightness_triggered() { showFilterForm(new BrightnessFilter);}
@@ -243,3 +241,10 @@ void MainWindow::on_actionGray_triggered() { showFilterForm(new GrayFilter);}
 
 void MainWindow::on_actionNegative_triggered() { showFilterForm(new NegativeFilter);}
 
+void MainWindow::on_actionNoise_triggered() { showFilterForm(new NoiseFilter);}
+
+void MainWindow::on_actionPerona_Malik_Blur_triggered() { showFilterForm(new PeronaMalikBlur);}
+
+void MainWindow::on_actionRGBA_triggered() { showFilterForm(new RGBAFilter);}
+
+void MainWindow::on_actionSepia_triggered() { showFilterForm(new SepiaFilter);}

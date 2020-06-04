@@ -48,7 +48,6 @@ private slots:
     void on_actionEraser_triggered();
     void on_actionSpray_triggered();
     void on_actionColorpicker_triggered();
-    void enable();
 
 
     void on_actionRemoveLayer_triggered();
@@ -59,5 +58,9 @@ private slots:
     void on_actionContrast_triggered();
     void on_actionGray_triggered();
     void on_actionNegative_triggered();
+    void on_actionNoise_triggered();
+    void on_actionPerona_Malik_Blur_triggered();
+    void on_actionRGBA_triggered();
+    void on_actionSepia_triggered();
 };
 #endif // MAINWINDOW_H

@@ -93,6 +93,10 @@ border: 1px solid grey</string>
     <addaction name="actionContrast"/>
     <addaction name="actionGray"/>
     <addaction name="actionNegative"/>
+    <addaction name="actionNoise"/>
+    <addaction name="actionPerona_Malik_Blur"/>
+    <addaction name="actionRGBA"/>
+    <addaction name="actionSepia"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOption"/>
@@ -411,6 +415,26 @@ border: 1px solid grey</string>
   <action name="actionNegative">
    <property name="text">
     <string>Negative</string>
+   </property>
+  </action>
+  <action name="actionNoise">
+   <property name="text">
+    <string>Noise</string>
+   </property>
+  </action>
+  <action name="actionPerona_Malik_Blur">
+   <property name="text">
+    <string>Perona Malik Blur</string>
+   </property>
+  </action>
+  <action name="actionRGBA">
+   <property name="text">
+    <string>RGBA</string>
+   </property>
+  </action>
+  <action name="actionSepia">
+   <property name="text">
+    <string>Sepia</string>
    </property>
   </action>
  </widget>

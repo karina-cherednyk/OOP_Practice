@@ -1,3 +1,4 @@
+
 #include "filterform.h"
 #include "ui_filterform.h"
 #include <QFormLayout>
@@ -8,7 +9,7 @@
 #include <QString>
 
 FilterForm::FilterForm( AFilter* filt, const QImage& im, QWidget *parent) :
-    QWidget(parent,Qt::Window),_origin(im),_res(new QImage(im)),_filter(filt),_name(filt->getFilterName()),
+    QDialog(parent),_origin(im),_res(new QImage(im)),_filter(filt),_name(filt->getFilterName()),
     ui(new Ui::FilterForm)
 {
     ui->setupUi(this);
@@ -79,11 +80,11 @@ void FilterForm::on_tryButton_clicked()
 
 void FilterForm::on_cancelButton_clicked()
 {
-    hide();
+    close();
 }
 
 void FilterForm::on_confirmButton_clicked()
 {
     emit addImage(_name, *_res);
-    hide();
+    close();
 }

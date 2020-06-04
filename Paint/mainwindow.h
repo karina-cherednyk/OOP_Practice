@@ -9,6 +9,8 @@
 #include <QStackedLayout>
 #include <QListView>
 
+#include <filters/afilter.h>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -30,6 +32,7 @@ private:
     Ui::MainWindow *ui;
     QListView* layerList;
     bool requestSaving();
+    void showFilterForm(AFilter*  f);
 
 private slots:
     bool save(const QByteArray &fileFormat = "png");
@@ -45,11 +48,16 @@ private slots:
     void on_actionEraser_triggered();
     void on_actionSpray_triggered();
     void on_actionColorpicker_triggered();
-
+    void enable();
 
 
     void on_actionRemoveLayer_triggered();
     void on_actionAddLayer_triggered();
     void on_actionBrightness_triggered();
+
+    void on_actionBlack_and_white_triggered();
+    void on_actionContrast_triggered();
+    void on_actionGray_triggered();
+    void on_actionNegative_triggered();
 };
 #endif // MAINWINDOW_H

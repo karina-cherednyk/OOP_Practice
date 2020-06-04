@@ -11,7 +11,7 @@
 
 Canvas::Canvas(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Canvas),_penWidth(1),_penColor(Qt::black),
+    ui(new Ui::Canvas),_penWidth(5),_penColor(Qt::black),
     _modified(false),_curSave(0),_lastAvailableSave(0),
     _tool(Pen),_model(this),_c(1),_selection(this),_shape(this),_CWCursor(QPixmap(":/icons/cw.png")),_ACWCursor(QPixmap(":/icons/acw.png"))
 {
@@ -472,6 +472,7 @@ void Canvas::addImage(const QString &name, const QImage &im)
                        im.scaled(_image->size(), Qt::IgnoreAspectRatio), true});
     _model.insertRow(pos);
      emit setSelected(_model.index(pos));
+     _image = &_layers[pos].content();
      setEnabled(true);
 }
 

@@ -7,8 +7,8 @@
 #include <QSizePolicy>
 #include <QString>
 
-FilterForm::FilterForm( const QString& name, AFilter* filt, const QImage& im, QWidget *parent) :
-    QWidget(parent,Qt::Window),_origin(im),_res(new QImage(im)),_filter(filt),_name(name),
+FilterForm::FilterForm( AFilter* filt, const QImage& im, QWidget *parent) :
+    QWidget(parent,Qt::Window),_origin(im),_res(new QImage(im)),_filter(filt),_name(filt->getFilterName()),
     ui(new Ui::FilterForm)
 {
     ui->setupUi(this);
@@ -16,7 +16,7 @@ FilterForm::FilterForm( const QString& name, AFilter* filt, const QImage& im, QW
     _sample = ui->sampleWidget;
     _sample->setPointer(&_res);
     _sample->update();
-    ui->filterName->setText(name);
+    ui->filterName->setText(_name);
     QSizePolicy pol(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     for(const Parameter& p : _filter->getParams()){

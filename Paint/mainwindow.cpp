@@ -14,7 +14,11 @@
 #include "layermodel.h"
 #include <QModelIndex>
 #include <QToolButton>
+#include <filters/blackandwhitefilter.h>
 #include <filters/brightnessfilter.h>
+#include <filters/contrastfilter.h>
+#include <filters/grayfilter.h>
+#include <filters/negativefilter.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -110,6 +114,8 @@ bool MainWindow::requestSaving()
     return true;
 }
 
+
+
 /**
  * save canvas current _image, after that Canvas::_modified == false
  */
@@ -199,6 +205,7 @@ void MainWindow::on_actionColorpicker_triggered()
     _canvas.setTool(Canvas::ColorPicker);
 }
 
+
 void MainWindow::on_actionRemoveLayer_triggered()
 {
     const QModelIndex& selected = layerList->selectionModel()->currentIndex();
@@ -211,11 +218,28 @@ void MainWindow::on_actionAddLayer_triggered()
     _canvas.insertLayer(selected);
 }
 
-void MainWindow::on_actionBrightness_triggered()
+void MainWindow::enable()
 {
-    FilterForm* f = new FilterForm("Brightness filter",new BrightnessFilter, _canvas.getResImage(),this);
-
-    f->show();
-    connect(f, SIGNAL(addImage(const QString&, const QImage&)), &_canvas, SLOT(addImage(const QString&, const QImage&)));
-
+    setEnabled(true);
 }
+
+void MainWindow::showFilterForm(AFilter *filter)
+{
+    FilterForm* f = new FilterForm(filter, _canvas.getResImage(),this);
+
+    setEnabled(false);
+    f->show();
+    connect(f, SIGNAL(hide()), SLOT(enable()));
+    connect(f, SIGNAL(addImage(const QString&, const QImage&)), &_canvas, SLOT(addImage(const QString&, const QImage&)));
+}
+
+void MainWindow::on_actionBrightness_triggered() { showFilterForm(new BrightnessFilter);}
+
+void MainWindow::on_actionBlack_and_white_triggered() { showFilterForm(new BlackAndWhiteFilter);}
+
+void MainWindow::on_actionContrast_triggered() { showFilterForm(new ContrastFilter);}
+
+void MainWindow::on_actionGray_triggered() { showFilterForm(new GrayFilter);}
+
+void MainWindow::on_actionNegative_triggered() { showFilterForm(new NegativeFilter);}
+

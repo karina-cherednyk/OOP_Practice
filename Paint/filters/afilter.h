@@ -20,17 +20,21 @@ struct Parameter{
     Types type;
     double min;
     double max;
+    double def;
 };
 
 class AFilter
 {
 public:
     AFilter();
+    AFilter(const QString&);
     virtual~AFilter() {} ;
     virtual QList<Parameter> getParams() const;
     virtual QImage doFiltration(const QImage&,const QHash<QString,double>* coeffs = nullptr)=0;
+    virtual const QString& getFilterName()const;
 protected:
     QList<Parameter> params;//list of parameters for filtering
+    QString name;//name of filter
 
 };
 

@@ -19,7 +19,11 @@ SOURCES += \
     canvas.cpp \
     filterform.cpp \
     filters/afilter.cpp \
+    filters/blackandwhitefilter.cpp \
     filters/brightnessfilter.cpp \
+    filters/contrastfilter.cpp \
+    filters/grayfilter.cpp \
+    filters/negativefilter.cpp \
     layerdelegate.cpp \
     layermodel.cpp \
     main.cpp \
@@ -31,7 +35,11 @@ HEADERS += \
     canvas.h \
     filterform.h \
     filters/afilter.h \
+    filters/blackandwhitefilter.h \
     filters/brightnessfilter.h \
+    filters/contrastfilter.h \
+    filters/grayfilter.h \
+    filters/negativefilter.h \
     layerdelegate.h \
     layermodel.h \
     mainwindow.h \

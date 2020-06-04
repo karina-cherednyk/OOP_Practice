@@ -5,9 +5,9 @@
 #include <QImage>
 #include <QHash>
 QString BrightnessFilter::brightnessName = "Brightness";
-BrightnessFilter::BrightnessFilter()
+BrightnessFilter::BrightnessFilter(): AFilter("Brightness")
 {
-    params.append({ brightnessName, INT, -255,255 });
+    params.append({ brightnessName, INT, -255,255,0});
 }
 /**
  * @brief BrightnessFilter::doFiltration
@@ -16,10 +16,10 @@ BrightnessFilter::BrightnessFilter()
  * @return image with new brightness
  */
 QImage BrightnessFilter::doFiltration(const QImage& img,const QHash<QString,double>* coeffs) {
-    setBrightness(coeffs->value(brightnessName));
+    if(coeffs!=nullptr)
+        setBrightness(coeffs->value(brightnessName));
     QImage res(img);
     res.convertTo(QImage::Format_ARGB32);
-    res.setAlphaChannel(img.alphaChannel());
     for(int i=0;i<res.height();++i){
         for(int j=0;j<res.width();++j){
             QColor current = res.pixel(j,i);
@@ -30,6 +30,7 @@ QImage BrightnessFilter::doFiltration(const QImage& img,const QHash<QString,doub
 
         }
     }
+    res.setAlphaChannel(img.alphaChannel());
     return res;
 
 }

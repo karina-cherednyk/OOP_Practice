@@ -25,7 +25,7 @@ class FilterForm : public QWidget
     const QString _name;
 
 public:
-    explicit FilterForm(const QString& name, AFilter* filt,const QImage& im, QWidget *parent = nullptr);
+    explicit FilterForm(AFilter* filt,const QImage& im, QWidget *parent = nullptr);
     ~FilterForm();
 signals:
     void addImage(const QString&, const QImage&);

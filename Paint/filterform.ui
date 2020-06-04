@@ -13,7 +13,7 @@
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>700</height>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -60,7 +60,7 @@ background: url(:/icons/background.png)</string>
      <property name="minimumSize">
       <size>
        <width>600</width>
-       <height>10</height>
+       <height>20</height>
       </size>
      </property>
      <property name="font">
@@ -78,7 +78,7 @@ background: url(:/icons/background.png)</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>200</height>
+       <height>100</height>
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -87,6 +87,9 @@ background: url(:/icons/background.png)</string>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>1</number>
+        </property>
         <item>
          <widget class="QPushButton" name="cancelButton">
           <property name="text">

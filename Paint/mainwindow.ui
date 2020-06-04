@@ -89,6 +89,10 @@ border: 1px solid grey</string>
      <string>Filters</string>
     </property>
     <addaction name="actionBrightness"/>
+    <addaction name="actionBlack_and_white"/>
+    <addaction name="actionContrast"/>
+    <addaction name="actionGray"/>
+    <addaction name="actionNegative"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOption"/>
@@ -387,6 +391,26 @@ border: 1px solid grey</string>
   <action name="actionBrightness">
    <property name="text">
     <string>Brightness</string>
+   </property>
+  </action>
+  <action name="actionBlack_and_white">
+   <property name="text">
+    <string>Black and white</string>
+   </property>
+  </action>
+  <action name="actionContrast">
+   <property name="text">
+    <string>Contrast</string>
+   </property>
+  </action>
+  <action name="actionGray">
+   <property name="text">
+    <string>Gray</string>
+   </property>
+  </action>
+  <action name="actionNegative">
+   <property name="text">
+    <string>Negative</string>
    </property>
   </action>
  </widget>

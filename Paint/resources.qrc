@@ -29,5 +29,7 @@
         <file>icons/cw.png</file>
         <file>stylesheets/Aqua.qss</file>
         <file>icons/triangle.png</file>
+        <file>icons/down.png</file>
+        <file>icons/up.png</file>
     </qresource>
 </RCC>

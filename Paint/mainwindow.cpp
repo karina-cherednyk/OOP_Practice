@@ -73,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget* rightDockContainer = ui->rightDockWidget->widget();
     (rightDockContainer->findChild<QToolButton*>("addLayerButton"))->setDefaultAction(ui->actionAddLayer);
     (rightDockContainer->findChild<QToolButton*>("removeLayerButton"))->setDefaultAction(ui->actionRemoveLayer);
+    (rightDockContainer->findChild<QToolButton*>("upLayerButton"))->setDefaultAction(ui->actionUpLayer);
+    (rightDockContainer->findChild<QToolButton*>("downLayerButton"))->setDefaultAction(ui->actionDownLayer);
 
     layerList = rightDockContainer->findChild<QListView*>("layerList");
     layerList->setItemDelegate(new LayerDelegate(this));
@@ -96,6 +98,8 @@ MainWindow::MainWindow(QWidget *parent)
     //
     connect(&_canvas, SIGNAL(toolSet(Tool)), SLOT(setCurrentTool(Tool)));
     addToolmages();
+
+
 }
 
 
@@ -249,6 +253,19 @@ void MainWindow::on_actionAddLayer_triggered()
 {
     const QModelIndex& selected = layerList->selectionModel()->currentIndex();
     _canvas.insertLayer(selected);
+}
+
+
+void MainWindow::on_actionUpLayer_triggered()
+{
+    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    _canvas.moveLayer(selected,true);
+}
+
+void MainWindow::on_actionDownLayer_triggered()
+{
+    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    _canvas.moveLayer(selected, false);
 }
 
 void MainWindow::showFilterForm(AFilter *filter)

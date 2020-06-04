@@ -227,6 +227,16 @@ void Canvas::removeLayer(const QModelIndex &ind)
 
 
 
+void Canvas::moveLayer(const QModelIndex& ind, bool up){
+     int i = ind.row();
+     int to = up ? i-1 : i+1;
+     if(i==-1 || i==_layers.size()) return;
+      _layers.swapItemsAt(i,to);
+      const QModelIndex& toInd = _model.index(to);
+      _model.dataChanged(toInd,ind);
+      emit setSelected(toInd);
+}
+
 
 //TODO add 4 cursors for rotation;
 void Canvas::mouseMoveEvent(QMouseEvent *event)

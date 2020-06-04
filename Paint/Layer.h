@@ -4,17 +4,19 @@
 #include <QImage>
 #include <QString>
 
+
 class Layer {
     QString _layerName;
-    QImage _content;
+    QImage* _content;
     bool _visible;
 public:
-    inline Layer(const QString& s, const QImage& im, bool v):_layerName(s),_content(im),_visible(v){}
-    QString& name() { return _layerName; }
-    QImage& content() { return  _content; }
-    bool& visible() { return _visible;}
-    const QString& name() const { return _layerName; }
-    const QImage& content() const { return  _content; }
-    const bool& visible() const { return _visible;}
+    inline Layer(const QString& s, const QImage& im, bool v):_layerName(s),_content(new QImage(im)),_visible(v){}
+    inline QString& name() { return _layerName; }
+    inline  QImage& content() { return  *_content; }
+    inline bool& visible() { return _visible;}
+    inline const QString& name() const { return _layerName; }
+    inline const QImage& content() const { return  *_content; }
+    inline const bool& visible() const { return _visible;}
+    const Layer& operator=(const Layer& l) = delete ;
 };
 #endif // LAYER_H

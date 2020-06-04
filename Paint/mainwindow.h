@@ -66,5 +66,7 @@ private slots:
     void on_actionSepia_triggered();
     void setCurrentTool(Tool t);
     void on_actionTriangle_triggered();
+    void on_actionUpLayer_triggered();
+    void on_actionDownLayer_triggered();
 };
 #endif // MAINWINDOW_H

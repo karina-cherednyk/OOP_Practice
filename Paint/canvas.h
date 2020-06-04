@@ -47,6 +47,7 @@ public slots:
     void setCurrentLayer(const QModelIndex& ind);
     void insertLayer(const QModelIndex& ind);
     void removeLayer(const QModelIndex& ind);
+    void moveLayer(const QModelIndex& ind, bool up);
     LayerModel* getModel();
     void addImage(const QString& name, const QImage& im);
 

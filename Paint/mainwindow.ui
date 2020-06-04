@@ -177,6 +177,32 @@ border: 1px solid grey</string>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
+        <widget class="QToolButton" name="downLayerButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="upLayerButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="removeLayerButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -455,6 +481,24 @@ border: 1px solid grey</string>
    </property>
    <property name="text">
     <string>Triangle</string>
+   </property>
+  </action>
+  <action name="actionUpLayer">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/up.png</normaloff>:/icons/up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Up Layer</string>
+   </property>
+  </action>
+  <action name="actionDownLayer">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/down.png</normaloff>:/icons/down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Down Layer</string>
    </property>
   </action>
  </widget>

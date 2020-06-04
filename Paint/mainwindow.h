@@ -14,13 +14,14 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
+typedef Canvas::Tool Tool ;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
     Canvas _canvas;
-
+    QAction* _currTool;
+    QMap<Tool, QIcon> _toolIcons;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -33,6 +34,7 @@ private:
     QListView* layerList;
     bool requestSaving();
     void showFilterForm(AFilter*  f);
+    void addToolmages();
 
 private slots:
     bool save(const QByteArray &fileFormat = "png");
@@ -62,5 +64,6 @@ private slots:
     void on_actionPerona_Malik_Blur_triggered();
     void on_actionRGBA_triggered();
     void on_actionSepia_triggered();
+    void setCurrentTool(Tool t);
 };
 #endif // MAINWINDOW_H

@@ -59,6 +59,7 @@ signals:
     void layerRemoved(const QModelIndex& ind);
     void redrawLayout(int row);
     void setSelected(const QModelIndex& ind);
+    void toolSet(Tool t);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;

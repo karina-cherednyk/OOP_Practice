@@ -437,6 +437,15 @@ border: 1px solid grey</string>
     <string>Sepia</string>
    </property>
   </action>
+  <action name="actionCurrent_tool">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/brush.png</normaloff>:/icons/brush.png</iconset>
+   </property>
+   <property name="text">
+    <string>Current tool</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>

@@ -87,6 +87,31 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&_canvas, SIGNAL(setSelected(const QModelIndex&)), layerList, SLOT(setCurrentIndex(const QModelIndex&)));
 
 
+    //add spacer
+    QWidget *spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    ui->toolBar->addWidget(spacer);
+    _currTool = ui->actionCurrent_tool;
+    ui->toolBar->addAction(_currTool);
+    //
+    connect(&_canvas, SIGNAL(toolSet(Tool)), SLOT(setCurrentTool(Tool)));
+    addToolmages();
+}
+
+
+
+void MainWindow::addToolmages()
+{
+    _toolIcons.insert(Tool::Pen, QIcon(":/icons/brush.png"));
+    _toolIcons.insert(Tool::Bucket,  QIcon(":/icons/fill.png"));
+    _toolIcons.insert(Tool::Eraser,  QIcon(":/icons/erase.png"));
+    _toolIcons.insert(Tool::Select,  QIcon(":/icons/select.png"));
+    _toolIcons.insert(Tool::Paste,  QIcon(":/icons/paste.png"));
+    _toolIcons.insert(Tool::Ellipse,  QIcon(":/icons/oval.png"));
+    _toolIcons.insert(Tool::Rectangle,  QIcon(":/icons/rectangle.png"));
+    _toolIcons.insert(Tool::Spray,  QIcon(":/icons/spray.png"));
+    _toolIcons.insert(Tool::ColorPicker,  QIcon(":/icons/picker.png"));
+    _toolIcons.insert(Tool::Rotate,  QIcon(":/icons/acw.png"));
 }
 
 MainWindow::~MainWindow()
@@ -231,6 +256,8 @@ void MainWindow::showFilterForm(AFilter *filter)
 
 }
 
+
+
 void MainWindow::on_actionBrightness_triggered() { showFilterForm(new BrightnessFilter);}
 
 void MainWindow::on_actionBlack_and_white_triggered() { showFilterForm(new BlackAndWhiteFilter);}
@@ -248,3 +275,8 @@ void MainWindow::on_actionPerona_Malik_Blur_triggered() { showFilterForm(new Per
 void MainWindow::on_actionRGBA_triggered() { showFilterForm(new RGBAFilter);}
 
 void MainWindow::on_actionSepia_triggered() { showFilterForm(new SepiaFilter);}
+
+void MainWindow::setCurrentTool(Tool t)
+{
+    _currTool->setIcon(_toolIcons[t]);
+}

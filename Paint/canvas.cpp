@@ -128,7 +128,7 @@ void Canvas::setTool(const Canvas::Tool &t)
 
     _tool = t;
 
-
+    emit toolSet(_tool);
 }
 
 

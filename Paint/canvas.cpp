@@ -29,6 +29,7 @@ Canvas::Canvas(QWidget *parent) :
 
      setFocusPolicy(Qt::StrongFocus);
 
+     connect(&_model, SIGNAL(changedIndex(const QModelIndex& )),SLOT(setCurrentLayer(const QModelIndex& )));
 
 }
 void drawTriangle(QPainter& p, const QRect& bounds){
@@ -46,7 +47,7 @@ void Canvas::paintEvent(QPaintEvent *event)
 
 
     for(int i=0; i<_layers.size();++i){
-        painter.drawImage(drawingArea, _layers[i].content(),drawingArea);
+       if(_layers[i].visible())  painter.drawImage(drawingArea, _layers[i].content(),drawingArea);
     }
 
     if(_tool == Rotate){
@@ -79,14 +80,15 @@ bool Canvas::openImage(const QString &fileName)
       if (!loadedImage.load(fileName))
           return false;
 
-      QSize newSize = loadedImage.size().expandedTo(size());
-      resizeCanvas(&loadedImage, newSize);
+      QSize newSize = loadedImage.size();
+     // resizeCanvas(&loadedImage, newSize);
       *_image = loadedImage;
       _modified = false;
-      setTool(Select);
-      _selection.setSelectionRect(QRect(QPoint(0,0),_image->size()));
-      _selection.setImage(*_image);
-      _selection.setAdjustMode();
+//      setTool(Select);
+//      _selection.setSelectionRect(QRect(QPoint(0,0),_image->size()));
+//      _selection.setImage(*_image);
+//      _selection.setAdjustMode();
+      resize(newSize);
       update();
       return true;
 }
@@ -98,7 +100,7 @@ QImage Canvas::getResImage()
     QPainter p(&res);
     QPoint o(0,0);
      for(int i=0; i<_layers.size();++i){
-        p.drawImage(o,_layers[i].content());
+         if(_layers[i].visible()) p.drawImage(o,_layers[i].content());
      }
      return res;
 }
@@ -137,6 +139,7 @@ void Canvas::setTool(const Canvas::Tool &t)
     _tool = t;
 
     emit toolSet(_tool);
+
 }
 
 
@@ -152,6 +155,7 @@ void Canvas::redo()
     }
     emit redoSignal(_curSave+1<=_lastAvailableSave);
     emit undoSignal(true);
+    _model.dataChanged(_model.index(0),_model.index(_layers.size()-1));
 }
 
 void Canvas::undo()
@@ -163,7 +167,7 @@ void Canvas::undo()
 
     emit undoSignal( _curSave);
     emit redoSignal(true);
-
+    _model.dataChanged(_model.index(0),_model.index(_layers.size()-1));
 
 }
 void clearArea(QImage& image, const QRect& area){
@@ -190,6 +194,10 @@ void Canvas::cut()
 void Canvas::setCurrentLayer(const QModelIndex(& ind))
 {
     _image = &_layers[ind.row()].content();
+    bool enabled = _layers[ind.row()].visible();
+    setEnabled(enabled);
+    resizeCanvas(_image);
+    update();
 }
 
 void Canvas::insertLayer(const QModelIndex &ind)
@@ -205,6 +213,7 @@ void Canvas::insertLayer(const QModelIndex &ind)
     _image->fill(qRgba(255,255,255,0));
      emit setSelected(_model.index(pos));
      setEnabled(true);
+     saveState();
 }
 
 void Canvas::removeLayer(const QModelIndex &ind)
@@ -230,7 +239,7 @@ void Canvas::removeLayer(const QModelIndex &ind)
 void Canvas::moveLayer(const QModelIndex& ind, bool up){
      int i = ind.row();
      int to = up ? i-1 : i+1;
-     if(i==-1 || i==_layers.size()) return;
+     if(to==-1 || to==_layers.size()) return;
       _layers.swapItemsAt(i,to);
       const QModelIndex& toInd = _model.index(to);
       _model.dataChanged(toInd,ind);
@@ -374,12 +383,7 @@ void Canvas::saveState()
 
 void Canvas::resizeEvent(QResizeEvent *event)
 {
-    if (width() > _image->width() || height() > _image->height()) {
-        int newWidth = qMax(width() + 128, _image->width());
-        int newHeight = qMax(height() + 128, _image->height());
-        resizeCanvas(_image, QSize(newWidth, newHeight));
-        update();
-    }
+        resizeCanvas(_image);
        QWidget::resizeEvent(event);
 }
 
@@ -400,7 +404,16 @@ void Canvas::drawLineTo(const QPoint &nextPoint)
     _lastPoint = nextPoint;
 }
 
+void Canvas::resizeCanvas(QImage *image)
+{
+    if (width() > _image->width() || height() > _image->height()) {
+        int newWidth = qMax(width() + 128, _image->width());
+        int newHeight = qMax(height() + 128, _image->height());
+        resizeCanvas(_image, QSize(newWidth, newHeight));
+        update();
+    }
 
+}
 
 void Canvas::resizeCanvas(QImage *image, const QSize &newSize)
 {

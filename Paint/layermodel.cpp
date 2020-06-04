@@ -26,8 +26,8 @@ QVariant LayerModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const Layer& l = _layers->at(index.row());
-    QPair<QString,QImage> pair(l.name(),l.content());
-    return QVariant::fromValue<QPair<QString,QImage>>(pair);
+    QPair<QString,QPair<bool,QImage>> pair(l.name(),QPair<bool, QImage>(l.visible(),l.content()));
+    return QVariant::fromValue< QPair<QString,QPair<bool,QImage>>>(pair);
 }
 
 /**
@@ -35,7 +35,11 @@ QVariant LayerModel::data(const QModelIndex &index, int role) const
  */
 bool LayerModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    (*_layers)[index.row()].name() = value.toString();
+    QPair<QString, bool > res = value.value<QPair<QString, bool>>();
+    (*_layers)[index.row()].name() = res.first;
+    (*_layers)[index.row()].visible() = res.second;
+
+    emit changedIndex(index);
     return true;
 }
 

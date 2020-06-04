@@ -76,6 +76,7 @@ private:
     void drawLineTo(const QPoint& p);
     void drawSelectionSquareTo(const QPoint& p);
     void resizeCanvas(QImage* image, const QSize &newSize);
+    void resizeCanvas(QImage* image);
     void saveState();
     void fill(QPoint pos);
     void drawSpray(QPoint pos);

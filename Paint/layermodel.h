@@ -48,7 +48,8 @@ public:
     }
 
 
-
+signals:
+    void changedIndex(const QModelIndex& index);
 
 };
 

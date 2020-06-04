@@ -5,6 +5,8 @@
 #include <QVBoxLayout>
 #include <QPixmap>
 #include <QDebug>
+#include <QCheckBox>
+#include <QVariant>
 
 LayerDelegate::LayerDelegate(QWidget *parent):QStyledItemDelegate(parent){
 
@@ -15,9 +17,12 @@ LayerDelegate::LayerDelegate(QWidget *parent):QStyledItemDelegate(parent){
  */
 void LayerDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    QPair<QString,QImage> data = index.model()->data(index, Qt::EditRole).value<QPair<QString,QImage>>();
-    QLineEdit* label = qobject_cast<QLineEdit*>(editor);
+    QPair<QString,QPair<bool,QImage>> data = index.model()->data(index, Qt::EditRole).value<QPair<QString,QPair<bool,QImage>>>();
+    QLineEdit* label = editor->findChild<QLineEdit*>();
+    QCheckBox* box = editor->findChild<QCheckBox*>();
     label->setText(data.first);
+    box->setChecked(data.second.first);
+
 }
 
 /**
@@ -25,10 +30,15 @@ void LayerDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
  */
 void LayerDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-     QLineEdit* label = qobject_cast<QLineEdit*>(editor);
+     QLineEdit* label = editor->findChild<QLineEdit*>();
+     QCheckBox* box =  editor->findChild<QCheckBox*>();
      QString val = label->text();
-     if(!val.isEmpty())
-         model->setData(index, val, Qt::EditRole);
+     bool b = box->isChecked();
+     if(!val.isEmpty()) {
+         QPair<QString, bool> res(val,b);
+         model->setData(index, QVariant::fromValue(res), Qt::EditRole);
+     }
+
 }
 
 /**
@@ -36,13 +46,14 @@ void LayerDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
  */
 void LayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QPair<QString,QImage> l = index.data().value<QPair<QString,QImage>>();
-
+    QPair<QString,QPair<bool,QImage>> l = index.data().value<QPair<QString,QPair<bool,QImage>>>();
+    const QImage& im =  l.second.second;
+    bool visible = l.second.first;
     QRect rect = option.rect;
 
 
     int m = 5; //margin
-    QImage preview = l.second.scaled(QSize(rect.width()-2*m,rect.height()-20));
+    QImage preview = im.scaled(QSize(rect.width()-2*m,rect.height()-25));
     QRect frame(QPoint(rect.left()+m,rect.top()+m),preview.size());
 
     painter->fillRect(frame, QPixmap(":/icons/background.png"));
@@ -55,22 +66,32 @@ void LayerDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 
      painter->drawImage(QPoint(rect.left()+m,rect.top()+m),preview);
 
-     QPoint tL(rect.left()+10,rect.bottom()-12);
+     QPoint tL(rect.left()+10,rect.bottom()-20);
      QRect text(tL,rect.bottomRight());
      painter->drawRect(frame);
 
      painter->drawText(text,l.first);
 
-
+    if(!visible) {
+        QImage select(rect.size(), QImage::Format_ARGB32);
+        select.fill(qRgba(0,0,0,64));
+        painter->drawImage(rect.topLeft(),select);
+    }
 }
 
 
 void LayerDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QRect rect = option.rect;
-    QPoint tL(rect.left(),rect.bottom()-12);
-    QRect text(tL,rect.bottomRight());
-    editor->setGeometry(text);
+    QPoint tL(rect.left(),rect.bottom()-20);
+    QRect bounds(tL,rect.bottomRight());
+    editor->setGeometry(bounds);
+
+    QLineEdit* label = editor->findChild<QLineEdit*>();
+    QCheckBox* box =  editor->findChild<QCheckBox*>();
+
+    QRect boxRect = QRect(label->width()+10, 0, 20 , 20);
+    box->setGeometry(boxRect);
 }
 
 QSize LayerDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -80,8 +101,10 @@ QSize LayerDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIn
 
 QWidget *LayerDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QLineEdit* editor = new QLineEdit(parent);
-    editor->setStyleSheet("background: white");
+    QWidget* editor = new QFrame(parent);
+    QLineEdit* lineEditor = new QLineEdit(editor);
+    lineEditor->setStyleSheet("background: white");
+    QCheckBox* box = new QCheckBox(editor);
     return editor;
 }
 

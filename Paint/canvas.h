@@ -19,7 +19,7 @@ class Canvas : public QWidget
     QCursor _CWCursor;
 
 public:
-    enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Spray, ColorPicker, Rotate };
+    enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Triangle, Spray, ColorPicker, Rotate };
 
     explicit Canvas(QWidget *parent = nullptr);
     ~Canvas();
@@ -80,10 +80,11 @@ private:
     void drawSpray(QPoint pos);
     void pickColor(QPoint pos);
     void prepareForRotation(QPoint pos);
-    void prepareForShapeChange(ShapeEvent& e, QPoint p);
     bool resizeSelectionArea(QPoint pos);
     bool setSelectionMode(QPoint pos);
     void pasteImage(QPoint pos);
+    bool isShapeTool();
+    void drawShape(QPainter& p);
     QColor getToolColor();
 
 

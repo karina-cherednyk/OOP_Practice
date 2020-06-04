@@ -31,7 +31,12 @@ Canvas::Canvas(QWidget *parent) :
 
 
 }
-
+void drawTriangle(QPainter& p, const QRect& bounds){
+    QPoint topMiddle((bounds.left()+bounds.right())/2, bounds.top());
+    p.drawLine(bounds.bottomLeft(), topMiddle);
+    p.drawLine(bounds.bottomRight(), topMiddle);
+    p.drawLine(bounds.bottomLeft(), bounds.bottomRight());
+}
 
 void Canvas::paintEvent(QPaintEvent *event)
 {
@@ -52,10 +57,9 @@ void Canvas::paintEvent(QPaintEvent *event)
         painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
         painter.drawRect(QRect(origin, _rotation.getRotatingRect().size()));
     }
-    else if(_tool == Rectangle || _tool == Ellipse){
+    else if(isShapeTool()){
         painter.setPen(QPen(getToolColor(),_penWidth));
-        if(_tool == Rectangle) painter.drawRect(_shape.getWorkingRect());
-        else  painter.drawEllipse(_shape.getWorkingRect());
+        drawShape(painter);
     }
     else if(_selection.hasSelection()){
         if(_selection.isFinished())
@@ -238,7 +242,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         _selection.processMove(p);
         update(_selection.getUpdateRect());
     }
-    else if(_tool == Rectangle || _tool == Ellipse) {
+    else if(isShapeTool()) {
         _shape.processMove(p);
         update(_shape.getUpdateRect());
     }
@@ -254,6 +258,8 @@ void Canvas::pasteImage(QPoint pos)
     _selection.enablePaste();
     update(_selection.getUpdateRect());
 }
+
+
 void Canvas::prepareForRotation(QPoint pos)
 {
     const QRect& selected = _selection.getWorkingRect();
@@ -263,11 +269,6 @@ void Canvas::prepareForRotation(QPoint pos)
     clearArea(*_image, selected);
 }
 
-void Canvas::prepareForShapeChange(ShapeEvent &e, QPoint p)
-{
-    e.processPress(p);
-    update(e.getUpdateRect());
-}
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
@@ -287,7 +288,10 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         update(_selection.getUpdateRect());
         emit enableCutCopy(true);
     }
-    else if(_tool == Rectangle || _tool == Ellipse) prepareForShapeChange(_shape,p);
+    else if(isShapeTool()) {
+        _shape.processPress(p);
+        update(_shape.getUpdateRect());
+    }
 
 }
 
@@ -308,13 +312,12 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 
 
     }
-    else if(_tool == Rectangle || _tool == Ellipse){
+    else if(isShapeTool()){
         _shape.processRelease();
         update(_shape.getUpdateRect());
         QPainter painter(_image);
         painter.setPen(QPen(getToolColor(),_penWidth));
-        if(_tool == Rectangle) painter.drawRect(_shape.getWorkingRect());
-        else painter.drawEllipse(_shape.getWorkingRect());
+        drawShape(painter);
     }
     else if(_tool == Rotate){
         QPainter painter(_image);
@@ -531,4 +534,15 @@ int getIndex(const QImage* im,  QList<Layer>&list){
    for(int i=0; i<list.size(); ++i)
        if(&(list[i].content()) == im) return i;
    return -1;
+}
+bool Canvas::isShapeTool()
+{
+    return _tool == Rectangle || _tool == Ellipse || _tool == Triangle;
+}
+
+void Canvas::drawShape(QPainter &painter)
+{
+    if(_tool == Rectangle) painter.drawRect(_shape.getWorkingRect());
+    else  if(_tool == Ellipse) painter.drawEllipse(_shape.getWorkingRect());
+    else if( _tool == Triangle) drawTriangle(painter, _shape.getWorkingRect());
 }

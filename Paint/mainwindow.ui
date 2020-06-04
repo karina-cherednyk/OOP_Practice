@@ -82,6 +82,7 @@ border: 1px solid grey</string>
     <addaction name="actionSelect"/>
     <addaction name="actionRectangle"/>
     <addaction name="actionEllipse"/>
+    <addaction name="actionTriangle"/>
     <addaction name="actionSpray"/>
    </widget>
    <widget class="QMenu" name="menuFilters">
@@ -126,6 +127,7 @@ border: 1px solid grey</string>
    <addaction name="separator"/>
    <addaction name="actionEllipse"/>
    <addaction name="actionRectangle"/>
+   <addaction name="actionTriangle"/>
    <addaction name="separator"/>
    <addaction name="actionCut"/>
    <addaction name="actionCopy"/>
@@ -444,6 +446,15 @@ border: 1px solid grey</string>
    </property>
    <property name="text">
     <string>Current tool</string>
+   </property>
+  </action>
+  <action name="actionTriangle">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/triangle.png</normaloff>:/icons/triangle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Triangle</string>
    </property>
   </action>
  </widget>

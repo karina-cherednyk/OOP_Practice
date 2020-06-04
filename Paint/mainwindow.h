@@ -65,5 +65,6 @@ private slots:
     void on_actionRGBA_triggered();
     void on_actionSepia_triggered();
     void setCurrentTool(Tool t);
+    void on_actionTriangle_triggered();
 };
 #endif // MAINWINDOW_H

@@ -112,6 +112,7 @@ void MainWindow::addToolmages()
     _toolIcons.insert(Tool::Spray,  QIcon(":/icons/spray.png"));
     _toolIcons.insert(Tool::ColorPicker,  QIcon(":/icons/picker.png"));
     _toolIcons.insert(Tool::Rotate,  QIcon(":/icons/acw.png"));
+    _toolIcons.insert(Tool::Triangle, QIcon(":/icons/triangle.png"));
 }
 
 MainWindow::~MainWindow()
@@ -233,7 +234,10 @@ void MainWindow::on_actionColorpicker_triggered()
 {
     _canvas.setTool(Canvas::ColorPicker);
 }
-
+void MainWindow::on_actionTriangle_triggered()
+{
+    _canvas.setTool(Canvas::Triangle);
+}
 
 void MainWindow::on_actionRemoveLayer_triggered()
 {
@@ -280,3 +284,5 @@ void MainWindow::setCurrentTool(Tool t)
 {
     _currTool->setIcon(_toolIcons[t]);
 }
+
+

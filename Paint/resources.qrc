@@ -28,5 +28,6 @@
         <file>icons/acw.png</file>
         <file>icons/cw.png</file>
         <file>stylesheets/Aqua.qss</file>
+        <file>icons/triangle.png</file>
     </qresource>
 </RCC>

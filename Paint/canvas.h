@@ -1,7 +1,7 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "Pair.h"
+#include "Layer.h"
 #include "layermodel.h"
 #include "rotateevent.h"
 #include "selectevent.h"
@@ -100,7 +100,7 @@ private:
 
 
     QImage* _image; // current drawing layer
-    QList<Pair<QString,QImage>> _layers; // all drawing layers
+    QList<Layer> _layers; // all drawing layers
     RotateEvent _rotation; //for Rotate tool
     SelectEvent _selection; // for Select tool
     ShapeEvent _shape;

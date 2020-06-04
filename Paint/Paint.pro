@@ -27,7 +27,7 @@ SOURCES += \
     selectevent.cpp
 
 HEADERS += \
-    Pair.h \
+    Layer.h \
     canvas.h \
     filterform.h \
     filters/afilter.h \

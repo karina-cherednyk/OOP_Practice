@@ -25,7 +25,8 @@ QVariant LayerModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    QPair<QString,QImage> pair(_layers->operator[](index.row()).operator QPair<QString,QImage>());
+    const Layer& l = _layers->at(index.row());
+    QPair<QString,QImage> pair(l.name(),l.content());
     return QVariant::fromValue<QPair<QString,QImage>>(pair);
 }
 
@@ -34,14 +35,14 @@ QVariant LayerModel::data(const QModelIndex &index, int role) const
  */
 bool LayerModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    (*_layers)[index.row()].first() = value.toString();
+    (*_layers)[index.row()].name() = value.toString();
     return true;
 }
 
 /**
  * is called one time inside Canvas class to pass pointer to its own layers list
  */
-void LayerModel::setLayersModel(QList<Pair<QString, QImage> > *layers)
+void LayerModel::setLayersModel(QList<Layer > *layers)
 {
     _layers = layers;
 }

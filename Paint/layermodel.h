@@ -1,6 +1,8 @@
 #ifndef LAYERMODEL_H
 #define LAYERMODEL_H
-#include "Pair.h"
+
+
+#include "Layer.h"
 
 #include <QDebug>
 #include <QAbstractListModel>
@@ -11,7 +13,7 @@
 class LayerModel : public QAbstractListModel
 {
     Q_OBJECT
-    QList<Pair<QString,QImage>>* _layers;
+    QList<Layer>* _layers;
 
 
 public:
@@ -31,7 +33,7 @@ public:
     }
 
 
-    void setLayersModel(QList<Pair<QString,QImage>>* layers);
+    void setLayersModel(QList<Layer>* layers);
 
     inline bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override{
         beginInsertRows(parent, row, row+count-1);

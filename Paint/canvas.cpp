@@ -17,12 +17,12 @@ Canvas::Canvas(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    _layers.append(Pair<QString,QImage>("Layer 0",QImage(width(), height(), QImage::Format_ARGB32)));
-    _layers[0].second().fill(Qt::transparent);
+    _layers.append(Layer("Layer 0",QImage(width(), height(), QImage::Format_ARGB32), true ));
+    _layers[0].content().fill(Qt::transparent);
     _model.setLayersModel(&_layers);
     _model.insertRow(0);
 
-    _image = &_layers[0].second();
+    _image = &_layers[0].content();
 
     _saves.append(QPair<QImage*,QImage>(_image,*_image));
 
@@ -41,7 +41,7 @@ void Canvas::paintEvent(QPaintEvent *event)
 
 
     for(int i=0; i<_layers.size();++i){
-        painter.drawImage(drawingArea, _layers[i].second(),drawingArea);
+        painter.drawImage(drawingArea, _layers[i].content(),drawingArea);
     }
 
     if(_tool == Rotate){
@@ -90,7 +90,7 @@ QImage Canvas::getResImage()
     QPainter p(&res);
     QPoint o(0,0);
      for(int i=0; i<_layers.size();++i){
-        p.drawImage(o,_layers[i].second());
+        p.drawImage(o,_layers[i].content());
      }
      return res;
 }
@@ -181,19 +181,19 @@ void Canvas::cut()
 
 void Canvas::setCurrentLayer(const QModelIndex(& ind))
 {
-    _image = &_layers[ind.row()].second();
+    _image = &_layers[ind.row()].content();
 }
 
 void Canvas::insertLayer(const QModelIndex &ind)
 {
     int pos = _layers.empty() ? 0 : ind.row()+1;
     _layers.insert(pos,
-                       Pair<QString,QImage>(
+                       Layer{
                        QString("Layer %0").arg(_c++),
-                       QImage(width(), height(), QImage::Format_ARGB32)));
+                       QImage(width(), height(), QImage::Format_ARGB32), true });
     _model.insertRow(pos);
 
-    _image = &_layers[pos].second();
+    _image = &_layers[pos].content();
     _image->fill(qRgba(255,255,255,0));
      emit setSelected(_model.index(pos));
      setEnabled(true);
@@ -210,8 +210,8 @@ void Canvas::removeLayer(const QModelIndex &ind)
         _image = nullptr;
         setEnabled(false);
     }
-    else if(r!=0) { _image = &_layers[r-1].second(); emit setSelected(_model.index(r-1)); }
-    else { _image = &_layers[r+1].second(); emit setSelected(_model.index(r)); }
+    else if(r!=0) { _image = &_layers[r-1].content(); emit setSelected(_model.index(r-1)); }
+    else { _image = &_layers[r+1].content(); emit setSelected(_model.index(r)); }
     _layers.removeAt(r);
     _model.dataChanged(ind,ind);
 
@@ -292,7 +292,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 }
 
 
-int getIndex(const QImage* im,  QList<Pair<QString,QImage>>&list);
+int getIndex(const QImage* im,  QList<Layer>&list);
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 
     if(_tool == Select){
@@ -467,9 +467,9 @@ void Canvas::addImage(const QString &name, const QImage &im)
 {
     int pos = _layers.size();
     _layers.insert(pos,
-                       Pair<QString,QImage>(
+                       {
                        QString("Layer %0 - %1").arg(_c++).arg(name),
-                       im.scaled(_image->size(), Qt::IgnoreAspectRatio)));
+                       im.scaled(_image->size(), Qt::IgnoreAspectRatio), true});
     _model.insertRow(pos);
      emit setSelected(_model.index(pos));
      setEnabled(true);
@@ -526,8 +526,8 @@ void Canvas::clearImage()
     saveState();
     update();
 }
-int getIndex(const QImage* im,  QList<Pair<QString,QImage>>&list){
+int getIndex(const QImage* im,  QList<Layer>&list){
    for(int i=0; i<list.size(); ++i)
-       if(&(list[i].second()) == im) return i;
+       if(&(list[i].content()) == im) return i;
    return -1;
 }

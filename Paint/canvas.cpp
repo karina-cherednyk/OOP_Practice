@@ -463,6 +463,18 @@ LayerModel *Canvas::getModel()
     return &_model;
 }
 
+void Canvas::addImage(const QString &name, const QImage &im)
+{
+    int pos = _layers.size();
+    _layers.insert(pos,
+                       Pair<QString,QImage>(
+                       QString("Layer %0 - %1").arg(_c++).arg(name),
+                       im.scaled(_image->size(), Qt::IgnoreAspectRatio)));
+    _model.insertRow(pos);
+     emit setSelected(_model.index(pos));
+     setEnabled(true);
+}
+
 void Canvas::pickColor(QPoint pos){
     _penColor = _image->pixelColor(pos);
 }

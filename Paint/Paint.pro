@@ -18,6 +18,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     canvas.cpp \
     filterform.cpp \
+    filters/afilter.cpp \
+    filters/brightnessfilter.cpp \
     layerdelegate.cpp \
     layermodel.cpp \
     main.cpp \
@@ -28,6 +30,8 @@ HEADERS += \
     Pair.h \
     canvas.h \
     filterform.h \
+    filters/afilter.h \
+    filters/brightnessfilter.h \
     layerdelegate.h \
     layermodel.h \
     mainwindow.h \
@@ -48,3 +52,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    filters/test.jpg \
+    filters/test.png

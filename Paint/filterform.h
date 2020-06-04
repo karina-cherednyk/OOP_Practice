@@ -22,15 +22,23 @@ class FilterForm : public QWidget
     QImage* _res;
     SampleWidget* _sample;
     QFormLayout* _form;
+    const QString _name;
 
 public:
-    explicit FilterForm(const QImage& im, QWidget *parent = nullptr);
+    explicit FilterForm(const QString& name, AFilter* filt,const QImage& im, QWidget *parent = nullptr);
     ~FilterForm();
-
+signals:
+    void addImage(const QString&, const QImage&);
 private slots:
 
 
     void on_tryButton_clicked();
+
+
+
+    void on_cancelButton_clicked();
+
+    void on_confirmButton_clicked();
 
 private:
     Ui::FilterForm *ui;

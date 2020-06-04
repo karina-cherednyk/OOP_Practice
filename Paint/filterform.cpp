@@ -4,10 +4,11 @@
 #include <QIntValidator>
 #include <QLineEdit>
 #include <QDebug>
+#include <QSizePolicy>
+#include <QString>
 
-
-FilterForm::FilterForm( const QImage& im, QWidget *parent) :
-    QWidget(parent,Qt::Window),_origin(im),_res(new QImage(im)),
+FilterForm::FilterForm( const QString& name, AFilter* filt, const QImage& im, QWidget *parent) :
+    QWidget(parent,Qt::Window),_origin(im),_res(new QImage(im)),_filter(filt),_name(name),
     ui(new Ui::FilterForm)
 {
     ui->setupUi(this);
@@ -15,19 +16,27 @@ FilterForm::FilterForm( const QImage& im, QWidget *parent) :
     _sample = ui->sampleWidget;
     _sample->setPointer(&_res);
     _sample->update();
+    ui->filterName->setText(name);
+    QSizePolicy pol(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    for(const Parameter& p : _filter->getParams()){
+        QLabel* name = new QLabel(this);
+        QLineEdit* param = new QLineEdit(this);
+        if( p.type == INT) param->setValidator(intValidator(p.min,p.max));
+        else if(p.type == DOUBLE) param->setValidator(doubleValidator(p.min, p.max));
+
+        name->setText(p.name);
+
+        pol.setHorizontalStretch(1);
+        name->setSizePolicy(pol);
+        param->setSizePolicy(pol);
+        param->setText("5");
+        param->setMaxLength(5);
+        param->setObjectName(p.name);
+        _form->addRow(name, param);_form->itemAt(0,  QFormLayout::FieldRole)->widget()->objectName();
+    }
 
 
-//    for(const Parameter& p : _filter->getParams()){
-//        QLabel* name = new QLabel(this);
-//        QLineEdit* param = new QLineEdit(this);
-//        if( p.type == INT) param->setValidator(intValidator(p.min,p.max));
-//        else if(p.type == DOUBLE) param->setValidator(doubleValidator(p.min, p.max));
-
-//        name->setText(p.name);
-//        param->setText("5");
-//        _form->addRow(name, param);
-//    }
-//    qDebug() << _form->children();
 }
 
 
@@ -35,7 +44,7 @@ FilterForm::FilterForm( const QImage& im, QWidget *parent) :
 FilterForm::~FilterForm()
 {
     delete _res;
-//    delete  _filter;
+    delete  _filter;
     delete ui;
 }
 
@@ -57,6 +66,24 @@ QIntValidator *FilterForm::intValidator(int min, int max)
 
 void FilterForm::on_tryButton_clicked()
 {
-//    if(_res) delete _res;
-//    _res = new QImage(_filter->doFiltration(_origin));
+    QHash<QString, double>* coeffs = new QHash<QString, double>;
+    QLineEdit* edit;
+    for(int i=0; i<_form->rowCount(); i++){
+        edit = qobject_cast<QLineEdit*> (_form->itemAt(0,  QFormLayout::FieldRole)->widget());
+        coeffs->insert(edit->objectName(), edit->text().toDouble());
+    }
+    if(_res) delete _res;
+    _res = new QImage(_filter->doFiltration(_origin, coeffs));
+    _sample->update();
+}
+
+void FilterForm::on_cancelButton_clicked()
+{
+    hide();
+}
+
+void FilterForm::on_confirmButton_clicked()
+{
+    emit addImage(_name, *_res);
+    hide();
 }

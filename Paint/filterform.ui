@@ -36,8 +36,8 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>570</width>
-       <height>450</height>
+       <width>16777215</width>
+       <height>16777215</height>
       </size>
      </property>
      <property name="autoFillBackground">
@@ -88,7 +88,7 @@ background: url(:/icons/background.png)</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="cancelButton">
           <property name="text">
            <string>Cancel</string>
           </property>
@@ -102,7 +102,7 @@ background: url(:/icons/background.png)</string>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="confirmButton">
           <property name="text">
            <string>Confirm</string>
           </property>

@@ -14,6 +14,7 @@
 #include "layermodel.h"
 #include <QModelIndex>
 #include <QToolButton>
+#include <filters/brightnessfilter.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -212,6 +213,9 @@ void MainWindow::on_actionAddLayer_triggered()
 
 void MainWindow::on_actionBrightness_triggered()
 {
-    FilterForm* f = new FilterForm(_canvas.getResImage(),this);
+    FilterForm* f = new FilterForm("Brightness filter",new BrightnessFilter, _canvas.getResImage(),this);
+
     f->show();
+    connect(f, SIGNAL(addImage(const QString&, const QImage&)), &_canvas, SLOT(addImage(const QString&, const QImage&)));
+
 }

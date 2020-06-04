@@ -48,7 +48,7 @@ public slots:
     void insertLayer(const QModelIndex& ind);
     void removeLayer(const QModelIndex& ind);
     LayerModel* getModel();
-
+    void addImage(const QString& name, const QImage& im);
 
 signals:
     void undoSignal(bool);

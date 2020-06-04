@@ -83,6 +83,10 @@ bool Canvas::openImage(const QString &fileName)
       resizeCanvas(&loadedImage, newSize);
       *_image = loadedImage;
       _modified = false;
+      setTool(Select);
+      _selection.setSelectionRect(QRect(QPoint(0,0),_image->size()));
+      _selection.setImage(*_image);
+      _selection.setAdjustMode();
       update();
       return true;
 }
@@ -255,7 +259,7 @@ void Canvas::pasteImage(QPoint pos)
 {
     _selection.setSelectionRect(QRect(pos,_selection.getWorkingRect().size()));
     _tool = Select;
-    _selection.enablePaste();
+    _selection.setAdjustMode();
     update(_selection.getUpdateRect());
 }
 
@@ -398,6 +402,7 @@ void Canvas::resizeCanvas(QImage *image, const QSize &newSize)
 
     painter.drawImage(QPoint(0,0), *_image);
     *_image = newImage;
+
 }
 
 void Canvas::fill(QPoint pos){

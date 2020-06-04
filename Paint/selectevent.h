@@ -70,9 +70,21 @@ public:
      * as default mode is None (modified image not shown),
      * sets mode to smthn else to make image be drawn on canvas
      */
-    inline void enablePaste(){
+    inline void setAdjustMode(){
+        _isVisible = true;
         _mode = Move;
     }
+    /**
+     * select area programmatically
+     */
+    inline void setSelectionRect(const QRect& r){
+        _bufferedRect = r;
+        _workingRect = r;
+        if(_updateRect.isNull()) _updateRect = _workingRect;
+        else _updateRect |= _workingRect;
+        _updateRect.adjust(-3,-3,3,3);
+    }
+
     void processRelease() override;
     void processMove(QPoint p) override;
     void processPress(QPoint p) override;

@@ -2,6 +2,7 @@
 #define SHAPEEVENT_H
 #include <QRect>
 #include <QWidget>
+#include <QDebug>
 class ShapeEvent
 {
 
@@ -52,10 +53,7 @@ public:
     }
 
 
-    inline void setSelectionRect(const QRect& r){
-        _workingRect = r;
-        _updateRect |= _workingRect;
-    }
+
 
     inline const QRect& getUpdateRect(){
         return _updateRect;

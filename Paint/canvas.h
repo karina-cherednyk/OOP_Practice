@@ -31,7 +31,6 @@ public:
 
     bool openImage(const QString& file);
     bool saveImage(const QString& file, const char* fileFormat);
-    void setPenColor(const QColor& color);
     void setPenWidth(int width);
     void setTool(const Tool& t);
     QImage getResImage();
@@ -50,6 +49,7 @@ public slots:
     void moveLayer(const QModelIndex& ind, bool up);
     LayerModel* getModel();
     void addImage(const QString& name, const QImage& im);
+    void setPenColor(const QColor& color);
 
 signals:
     void undoSignal(bool);

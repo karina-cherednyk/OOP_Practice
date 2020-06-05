@@ -162,7 +162,7 @@ border: 1px solid grey</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>152</width>
+         <width>200</width>
          <height>16777215</height>
         </size>
        </property>
@@ -232,6 +232,12 @@ border: 1px solid grey</string>
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="ColorPicker" name="colorpicker"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -502,6 +508,14 @@ border: 1px solid grey</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorPicker</class>
+   <extends>QWidget</extends>
+   <header>colorpicker.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

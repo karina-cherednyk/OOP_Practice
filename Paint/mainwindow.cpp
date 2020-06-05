@@ -99,7 +99,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&_canvas, SIGNAL(toolSet(Tool)), SLOT(setCurrentTool(Tool)));
     addToolmages();
 
-
+    //connect custom collor picker
+    connect(ui->colorpicker, SIGNAL(colorSet(const QColor& )), &_canvas, SLOT(setPenColor(const QColor& )));
 }
 
 

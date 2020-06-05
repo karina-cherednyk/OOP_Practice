@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     canvas.cpp \
+    colorpicker/colorpicker.cpp \
     filterform.cpp \
     filters/afilter.cpp \
     filters/blackandwhitefilter.cpp \
@@ -37,6 +38,8 @@ SOURCES += \
 HEADERS += \
     Layer.h \
     canvas.h \
+    colorpicker/colorpicker.h \
+    colorpicker/colorspectrum.h \
     filterform.h \
     filters/afilter.h \
     filters/blackandwhitefilter.h \
@@ -58,6 +61,7 @@ HEADERS += \
 
 FORMS += \
     canvas.ui \
+    colorpicker/colorpicker.ui \
     filterform.ui \
     mainwindow.ui
 

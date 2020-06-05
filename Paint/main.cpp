@@ -11,6 +11,6 @@ int main(int argc, char *argv[])
     QString stylesheet = QLatin1String(stylesheet_file.readAll());
     a.setStyleSheet(stylesheet);
     MainWindow w;
-    w.show();
+    w.showMaximized();
     return a.exec();
 }

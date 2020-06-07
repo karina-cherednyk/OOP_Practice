@@ -41,7 +41,11 @@ MainWindow::MainWindow(QWidget *parent)
           QString text = QString(format).toUpper();
           QAction *action = new QAction(text, this);
           action->setData(format);
-          connect(action, SIGNAL(triggered()), this, SLOT(save()));
+          connect(action, &QAction::triggered,
+                  [=](){
+              save(action->data().toByteArray());
+          }
+                  );
 
           ui->menu_Save_As->addAction(action);
       }

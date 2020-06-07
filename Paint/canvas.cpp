@@ -153,6 +153,16 @@ void Canvas::selectAll()
      update();
 }
 
+void Canvas::removeAll()
+{
+    if(_layers.isEmpty()) return;
+    const QModelIndex& f = _model.index(0), l = _model.index(_layers.size()-1);
+    _layers.clear();
+    _saves.clear();
+    update();
+    _model.dataChanged(f,l);
+}
+
 
 
 void Canvas::redo()

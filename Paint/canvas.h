@@ -36,6 +36,7 @@ public:
     void setPenWidth(int width);
     void setTool(const Tool& t);
     void selectAll();
+    void removeAll();
     QImage getResImage();
 
 

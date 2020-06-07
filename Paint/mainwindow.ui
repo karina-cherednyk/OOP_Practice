@@ -55,6 +55,7 @@
       <string>&amp;Save As</string>
      </property>
     </widget>
+    <addaction name="actionNew"/>
     <addaction name="menu_Save_As"/>
     <addaction name="actionOpen"/>
     <addaction name="actionExit"/>
@@ -523,6 +524,11 @@
    </property>
    <property name="text">
     <string>Select All</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>

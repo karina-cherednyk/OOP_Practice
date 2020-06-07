@@ -186,9 +186,15 @@ bool MainWindow::save(const QByteArray &fileFormat)
 
 void MainWindow::open()
 {
-    if(requestSaving()){ //save image before open next one
-        QString fileName = QFileDialog::getOpenFileName(this, "Open file", QDir::currentPath());
-        if(!fileName.isEmpty()) _canvas.openImage(fileName);
+
+    QString fileName = QFileDialog::getOpenFileName(this, "Open file", QDir::currentPath());
+    if(!fileName.isEmpty()) _canvas.openImage(fileName);
+
+}
+void MainWindow::on_actionNew_triggered()
+{
+    if(requestSaving()){
+        _canvas.removeAll();
     }
 }
 
@@ -322,3 +328,4 @@ void MainWindow::on_actionSelect_All_triggered()
 {
     _canvas.selectAll();
 }
+

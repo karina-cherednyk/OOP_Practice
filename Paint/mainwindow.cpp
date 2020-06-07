@@ -42,20 +42,21 @@ MainWindow::MainWindow(QWidget *parent)
           QAction *action = new QAction(text, this);
           action->setData(format);
           connect(action, &QAction::triggered,
-                  [=](){
-              save(action->data().toByteArray());
-          }
+                  [=](){ save(action->data().toByteArray());  }
                   );
 
           ui->menu_Save_As->addAction(action);
       }
 
     //main window only events
+
     connect(ui->actionOpen, SIGNAL(triggered()), SLOT(open()) );
     connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
     connect(ui->actionPen_color,SIGNAL(triggered()), SLOT(invokePenColorDialog()));
     connect(ui->actionPen_width,SIGNAL(triggered()), SLOT(invokePenWidthDialog()));
     connect(ui->actionClear_screen, SIGNAL(triggered()), &_canvas,SLOT(clearImage()));
+    connect(ui->actionSave, SIGNAL(triggered()), SLOT(save()) );
+
 
     //canvas redo/ undo actions
     connect(ui->actionRedo,SIGNAL(triggered()), &_canvas, SLOT(redo()));
@@ -76,23 +77,23 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // add/ remove layout
-    QWidget* rightDockContainer = ui->rightDockWidget->widget();
+    QWidget* rightDockContainer = ui->layersDockWidget->widget();
     (rightDockContainer->findChild<QToolButton*>("addLayerButton"))->setDefaultAction(ui->actionAddLayer);
     (rightDockContainer->findChild<QToolButton*>("removeLayerButton"))->setDefaultAction(ui->actionRemoveLayer);
     (rightDockContainer->findChild<QToolButton*>("upLayerButton"))->setDefaultAction(ui->actionUpLayer);
     (rightDockContainer->findChild<QToolButton*>("downLayerButton"))->setDefaultAction(ui->actionDownLayer);
 
-    layerList = rightDockContainer->findChild<QListView*>("layerList");
-    layerList->setItemDelegate(new LayerDelegate(this));
-    layerList->setModel(_canvas.getModel());
-    layerList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    _layerList = rightDockContainer->findChild<QListView*>("layerList");
+    _layerList->setItemDelegate(new LayerDelegate(this));
+    _layerList->setModel(_canvas.getModel());
+    _layerList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     //change current Canvas::_image to draw on
-    connect(layerList, SIGNAL(pressed(const QModelIndex&)),  &_canvas, SLOT(setCurrentLayer(const QModelIndex&)));
-    layerList->setCurrentIndex(_canvas.getModel()->index(0));
+    connect(_layerList, SIGNAL(pressed(const QModelIndex&)),  &_canvas, SLOT(setCurrentLayer(const QModelIndex&)));
+    _layerList->setCurrentIndex(_canvas.getModel()->index(0));
 
     //when layer is added deleted, next selection is determined insede Canvas class
-    connect(&_canvas, SIGNAL(setSelected(const QModelIndex&)), layerList, SLOT(setCurrentIndex(const QModelIndex&)));
+    connect(&_canvas, SIGNAL(setSelected(const QModelIndex&)), _layerList, SLOT(setCurrentIndex(const QModelIndex&)));
 
 
     //add spacer
@@ -107,6 +108,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     //connect custom collor picker
     connect(ui->colorpicker, SIGNAL(colorSet(const QColor& )), &_canvas, SLOT(setPenColor(const QColor& )));
+
+    setWindowTitle("Graphics Editor");
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 
@@ -147,6 +151,19 @@ void MainWindow::resizeEvent(QResizeEvent *event)
           first = false;
     }
 }
+//select layer up[l] or down[h]
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    int i = _layerList->currentIndex().row();
+    QModelIndex next;
+    if(event->key() == Qt::Key_H && i!= 0)
+         next  = _layerList->model()->index(--i,0);
+    else if(event->key() == Qt::Key_L && i!= _layerList->model()->rowCount()-1)
+         next = _layerList->model()->index(++i,0);
+    else return;
+     _layerList->setCurrentIndex(next);
+     _canvas.setCurrentLayer(next);
+}
 
 /**
  * open save dialog when canvas was modified after last save
@@ -184,10 +201,18 @@ bool MainWindow::save(const QByteArray &fileFormat)
    if (fileName.isEmpty())
        return false;
 
+   qDebug() << fileName;
    return _canvas.saveImage(fileName, fileFormat.constData());
 
 }
+bool MainWindow::save()
+{
 
+    QByteArray fileFormat("png");
+    QString fileName ="../untitled." + fileFormat;
+   return _canvas.saveImage(fileName, fileFormat.constData());
+
+}
 void MainWindow::open()
 {
 
@@ -269,26 +294,26 @@ void MainWindow::on_actionTriangle_triggered()
 
 void MainWindow::on_actionRemoveLayer_triggered()
 {
-    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
     _canvas.removeLayer(selected);
 }
 
 void MainWindow::on_actionAddLayer_triggered()
 {
-    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
     _canvas.insertLayer(selected);
 }
 
 
 void MainWindow::on_actionUpLayer_triggered()
 {
-    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
     _canvas.moveLayer(selected,true);
 }
 
 void MainWindow::on_actionDownLayer_triggered()
 {
-    const QModelIndex& selected = layerList->selectionModel()->currentIndex();
+    const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
     _canvas.moveLayer(selected, false);
 }
 

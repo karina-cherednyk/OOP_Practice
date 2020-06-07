@@ -23,25 +23,26 @@ class MainWindow : public QMainWindow
     QAction* _currTool;
     QMap<Tool, QIcon> _toolIcons;
     QWidget* _container;
-
+     Canvas _canvas;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    Canvas _canvas;
+
 protected:
     void closeEvent(QCloseEvent* event) override;
     void resizeEvent(QResizeEvent *event) override;
-
+   void keyPressEvent(QKeyEvent *event) override;
 private:
     Ui::MainWindow *ui;
-    QListView* layerList;
+    QListView* _layerList;
     bool requestSaving();
     void showFilterForm(AFilter*  f);
     void addToolmages();
 
 private slots:
-    bool save(const QByteArray &fileFormat = "png");
+    bool save(const QByteArray &fileFormat);
+    bool save();
     void open();
     void invokePenColorDialog();
     void invokePenWidthDialog();

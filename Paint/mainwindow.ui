@@ -30,7 +30,7 @@
        <bool>false</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">background: transparent</string>
+       <string notr="true">background: rgb(200, 200, 200)</string>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
      </widget>
@@ -56,6 +56,7 @@
      </property>
     </widget>
     <addaction name="actionNew"/>
+    <addaction name="actionSave"/>
     <addaction name="menu_Save_As"/>
     <addaction name="actionOpen"/>
     <addaction name="actionExit"/>
@@ -147,7 +148,7 @@
    <addaction name="actionColorpicker"/>
    <addaction name="actionPen_color"/>
   </widget>
-  <widget class="QDockWidget" name="rightDockWidget">
+  <widget class="QDockWidget" name="layersDockWidget">
    <property name="contextMenuPolicy">
     <enum>Qt::NoContextMenu</enum>
    </property>
@@ -253,6 +254,9 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionExit">
    <property name="icon">
@@ -261,6 +265,9 @@
    </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
    </property>
   </action>
   <action name="actionPen_color">
@@ -275,6 +282,9 @@
   <action name="actionPen_width">
    <property name="text">
     <string>Pen width</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="actionClear_screen">
@@ -297,6 +307,9 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionRedo">
    <property name="enabled">
@@ -309,6 +322,9 @@
    <property name="text">
     <string>Redo</string>
    </property>
+   <property name="shortcut">
+    <string>Z</string>
+   </property>
   </action>
   <action name="actionBrush">
    <property name="icon">
@@ -317,6 +333,9 @@
    </property>
    <property name="text">
     <string>Brush</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="actionBucket">
@@ -327,6 +346,9 @@
    <property name="text">
     <string>Bucket fill</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
   </action>
   <action name="actionEraser">
    <property name="icon">
@@ -336,6 +358,9 @@
    <property name="text">
     <string>Eraser</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="actionSelect">
    <property name="icon">
@@ -344,6 +369,9 @@
    </property>
    <property name="text">
     <string>Select</string>
+   </property>
+   <property name="shortcut">
+    <string>S</string>
    </property>
   </action>
   <action name="actionCut">
@@ -357,6 +385,9 @@
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionCopy">
    <property name="enabled">
@@ -369,6 +400,9 @@
    <property name="text">
     <string>Copy</string>
    </property>
+   <property name="shortcut">
+    <string/>
+   </property>
   </action>
   <action name="actionPaste">
    <property name="enabled">
@@ -380,6 +414,9 @@
    </property>
    <property name="text">
     <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
   <action name="actionRectangle">
@@ -417,6 +454,9 @@
    <property name="text">
     <string>Colorpicker</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="actionAddLayer">
    <property name="icon">
@@ -425,6 +465,9 @@
    </property>
    <property name="text">
     <string>Add Layer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="actionRemoveLayer">
@@ -507,6 +550,9 @@
    <property name="text">
     <string>Up Layer</string>
    </property>
+   <property name="shortcut">
+    <string>K</string>
+   </property>
   </action>
   <action name="actionDownLayer">
    <property name="icon">
@@ -515,6 +561,9 @@
    </property>
    <property name="text">
     <string>Down Layer</string>
+   </property>
+   <property name="shortcut">
+    <string>J</string>
    </property>
   </action>
   <action name="actionSelect_All">
@@ -525,10 +574,24 @@
    <property name="text">
     <string>Select All</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="actionNew">
    <property name="text">
     <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

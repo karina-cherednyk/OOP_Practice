@@ -27,6 +27,7 @@ Canvas::Canvas(QWidget *parent) :
     connect(&_model, SIGNAL(changedIndex(const QModelIndex& )),SLOT(setCurrentLayer(const QModelIndex& )));
     _model.setLayersModel(&_layers);
     setEnabled(false);
+    setFocusPolicy(Qt::TabFocus);
 }
 void drawTriangle(QPainter& p, const QRect& bounds){
     QPoint topMiddle((bounds.left()+bounds.right())/2, bounds.top());
@@ -96,7 +97,7 @@ bool Canvas::openImage(const QString &fileName)
 
 QImage Canvas::getResImage()
 {
-    QImage res = QImage(_image->size(), QImage::Format_ARGB32);
+    QImage res = QImage(size(), QImage::Format_ARGB32);
     res.fill(Qt::transparent);
     QPainter p(&res);
     QPoint o(0,0);
@@ -111,8 +112,6 @@ QImage Canvas::getResImage()
 bool Canvas::saveImage(const QString &fileName, const char *fileFormat)
 {
     QImage savingImage = getResImage();
-    resizeImage(&savingImage, size());
-
     if(savingImage.save(fileName, fileFormat)){
 
         _modified = false;
@@ -260,7 +259,7 @@ void Canvas::removeLayer(const QModelIndex &ind)
 void Canvas::moveLayer(const QModelIndex& ind, bool up){
      int i = ind.row();
      int to = up ? i-1 : i+1;
-     if(to==-1 || to==_layers.size()) return;
+     if(to==-1 || to==_layers.size() || _layers.isEmpty()) return;
       _layers.swapItemsAt(i,to);
       const QModelIndex& toInd = _model.index(to);
       _model.dataChanged(toInd,ind);

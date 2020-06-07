@@ -30,11 +30,13 @@ MainWindow::MainWindow(QWidget *parent)
     _canvas(this) , ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    _container = ui->container;
+    QScrollArea* area = new QScrollArea(_container);
+    ui->container->layout()->addWidget(area);
+    area->setWidget(&_canvas);
 
-    ui->container->setLayout(new QHBoxLayout);
-    ui->container->layout()->setMargin(0);
-    ui->container->layout()->addWidget(&_canvas);
 
+    //adding actions
     foreach (QByteArray format, QImageWriter::supportedImageFormats()) {
           QString text = QString(format).toUpper();
           QAction *action = new QAction(text, this);
@@ -129,6 +131,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(requestSaving()) event->accept();
     else event->ignore();
+}
+bool first = true;
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+
+    if(_container->width()>1500 && first){
+        QSize canvasSize = _container->size()/1.5;
+        _canvas.resize(canvasSize);
+          first = false;
+    }
 }
 
 /**

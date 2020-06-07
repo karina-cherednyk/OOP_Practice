@@ -5,6 +5,8 @@
 #include "layermodel.h"
 #include "rotateevent.h"
 #include "selectevent.h"
+#include "resizable_inner_widget.h"
+
 
 #include <QWidget>
 
@@ -12,7 +14,7 @@ namespace Ui {
 class Canvas;
 }
 
-class Canvas : public QWidget
+class Canvas : public ResizableInnerWidget
 {
     Q_OBJECT
     QCursor _ACWCursor;
@@ -75,8 +77,7 @@ private:
     Ui::Canvas *ui;
     void drawLineTo(const QPoint& p);
     void drawSelectionSquareTo(const QPoint& p);
-    void resizeCanvas(QImage* image, const QSize &newSize);
-    void resizeCanvas(QImage* image);
+    void resizeImage(QImage* image, const QSize &newSize);
     void saveState();
     void fill(QPoint pos);
     void drawSpray(QPoint pos);
@@ -100,7 +101,6 @@ private:
     QList<QPair<QImage*,QImage>> _saves; //used with redo/undo actions
     int _curSave; //index of curent save in _saves
     int _lastAvailableSave; //as data in saves is often rewritten, holds index of last possible save image, is used in redo action
-
 
 
     QImage* _image; // current drawing layer

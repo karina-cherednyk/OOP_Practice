@@ -54,6 +54,7 @@ HEADERS += \
     layerdelegate.h \
     layermodel.h \
     mainwindow.h \
+    resizable_inner_widget.h \
     rotateevent.h \
     samplewidget.h \
     selectevent.h \

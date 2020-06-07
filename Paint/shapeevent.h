@@ -52,9 +52,6 @@ public:
         return _workingRect;
     }
 
-
-
-
     inline const QRect& getUpdateRect(){
         return _updateRect;
     }

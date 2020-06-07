@@ -8,29 +8,25 @@
 #include <QAbstractListModel>
 #include <QRandomGenerator>
 #include <cassert>
+#include "resizable_inner_widget.h"
 
 Canvas::Canvas(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Canvas),_penWidth(5),_penColor(Qt::black),
-    _modified(false),_curSave(0),_lastAvailableSave(0),
-    _tool(Pen),_model(this),_c(1),_selection(this),_shape(this),_CWCursor(QPixmap(":/icons/cw.png")),_ACWCursor(QPixmap(":/icons/acw.png"))
+    ResizableInnerWidget(parent),
+    ui(new Ui::Canvas),
+    _penWidth(5),_penColor(Qt::black),
+    _modified(false),_curSave(-1),_lastAvailableSave(-1),
+    _image(nullptr),_model(this),
+    _selection(this),_shape(this),
+    _tool(Pen),_c(0),
+    _CWCursor(QPixmap(":/icons/cw.png")),_ACWCursor(QPixmap(":/icons/acw.png"))
 {
+    setAttribute(Qt::WA_StyledBackground, true);
+    setStyleSheet("background-image: url(:/icons/background.png);border: 1px solid grey");
     ui->setupUi(this);
-
-    _layers.append(Layer("Layer 0",QImage(width(), height(), QImage::Format_ARGB32), true ));
-    _layers[0].content().fill(Qt::transparent);
+    setFocusPolicy(Qt::StrongFocus);
+    connect(&_model, SIGNAL(changedIndex(const QModelIndex& )),SLOT(setCurrentLayer(const QModelIndex& )));
     _model.setLayersModel(&_layers);
-    _model.insertRow(0);
-
-    _image = &_layers[0].content();
-
-    _saves.append(QPair<QImage*,QImage>(_image,*_image));
-
-
-     setFocusPolicy(Qt::StrongFocus);
-
-     connect(&_model, SIGNAL(changedIndex(const QModelIndex& )),SLOT(setCurrentLayer(const QModelIndex& )));
-
+    setEnabled(false);
 }
 void drawTriangle(QPainter& p, const QRect& bounds){
     QPoint topMiddle((bounds.left()+bounds.right())/2, bounds.top());
@@ -47,7 +43,10 @@ void Canvas::paintEvent(QPaintEvent *event)
 
 
     for(int i=0; i<_layers.size();++i){
-       if(_layers[i].visible())  painter.drawImage(drawingArea, _layers[i].content(),drawingArea);
+       if(_layers[i].visible())  {
+           resizeImage(&_layers[i].content(), size());
+           painter.drawImage(drawingArea, _layers[i].content(),drawingArea);
+       }
     }
 
     if(_tool == Rotate){
@@ -81,14 +80,11 @@ bool Canvas::openImage(const QString &fileName)
           return false;
 
       QSize newSize = loadedImage.size();
-     // resizeCanvas(&loadedImage, newSize);
-      *_image = loadedImage;
+      _layers.append(Layer(fileName, loadedImage));
+      _image = &_layers.last().content();
       _modified = false;
-//      setTool(Select);
-//      _selection.setSelectionRect(QRect(QPoint(0,0),_image->size()));
-//      _selection.setImage(*_image);
-//      _selection.setAdjustMode();
       resize(newSize);
+
       update();
       return true;
 }
@@ -100,6 +96,7 @@ QImage Canvas::getResImage()
     QPainter p(&res);
     QPoint o(0,0);
      for(int i=0; i<_layers.size();++i){
+
          if(_layers[i].visible()) p.drawImage(o,_layers[i].content());
      }
      return res;
@@ -109,7 +106,7 @@ QImage Canvas::getResImage()
 bool Canvas::saveImage(const QString &fileName, const char *fileFormat)
 {
     QImage savingImage = getResImage();
-    resizeCanvas(&savingImage, size());
+    resizeImage(&savingImage, size());
 
     if(savingImage.save(fileName, fileFormat)){
 
@@ -196,7 +193,7 @@ void Canvas::setCurrentLayer(const QModelIndex(& ind))
     _image = &_layers[ind.row()].content();
     bool enabled = _layers[ind.row()].visible();
     setEnabled(enabled);
-    resizeCanvas(_image);
+    resizeImage(_image,size());
     update();
 }
 
@@ -207,8 +204,8 @@ void Canvas::insertLayer(const QModelIndex &ind)
                        Layer{
                        QString("Layer %0").arg(_c++),
                        QImage(width(), height(), QImage::Format_ARGB32), true });
-    _model.insertRow(pos);
 
+    _model.insertRow(pos);
     _image = &_layers[pos].content();
     _image->fill(qRgba(255,255,255,0));
      emit setSelected(_model.index(pos));
@@ -250,6 +247,9 @@ void Canvas::moveLayer(const QModelIndex& ind, bool up){
 //TODO add 4 cursors for rotation;
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+    ResizableInnerWidget::mouseMoveEvent(event);
+    if(_beingResized) return;
+
     const QPoint& p = event->pos();
     if(_tool == Pen || _tool == Eraser ) drawLineTo(p);
     else if(_tool == ColorPicker) pickColor(p);
@@ -295,6 +295,9 @@ void Canvas::prepareForRotation(QPoint pos)
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
+    ResizableInnerWidget::mousePressEvent(event);
+    if(_beingResized) return;
+
     const QPoint& p = event->pos();
     if(_tool == Pen || _tool == Eraser) _lastPoint = p;
     else if(_tool == ColorPicker) pickColor(p);
@@ -321,6 +324,9 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 int getIndex(const QImage* im,  QList<Layer>&list);
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
+
+    ResizableInnerWidget::mouseReleaseEvent(event);
+    if(_beingResized) return;
 
     if(_tool == Select){
 
@@ -383,13 +389,12 @@ void Canvas::saveState()
 
 void Canvas::resizeEvent(QResizeEvent *event)
 {
-        resizeCanvas(_image);
-       QWidget::resizeEvent(event);
+       if(!_layers.isEmpty()) resizeImage(_image, size());
+       ResizableInnerWidget::resizeEvent(event);
 }
 
 void Canvas::drawLineTo(const QPoint &nextPoint)
 {
-
     QPainter painter(_image);
     if(_selection.hasSelection()) painter.setClipRect(_selection.getWorkingRect());
     if(_tool == Eraser) painter.setCompositionMode(QPainter::CompositionMode_Clear);
@@ -398,27 +403,18 @@ void Canvas::drawLineTo(const QPoint &nextPoint)
 
     int rad = (_penWidth / 2) + 2;
 
-    update(QRect(_lastPoint, nextPoint).normalized()
-                                   .adjusted(-rad, -rad, +rad, +rad));
+    update(QRect(_lastPoint, nextPoint)
+           .normalized()
+           .adjusted(-rad, -rad, +rad, +rad));
 
     _lastPoint = nextPoint;
 }
 
-void Canvas::resizeCanvas(QImage *image)
+
+
+void Canvas::resizeImage(QImage *image, const QSize &newSize)
 {
-    if (width() > _image->width() || height() > _image->height()) {
-        int newWidth = qMax(width() + 128, _image->width());
-        int newHeight = qMax(height() + 128, _image->height());
-        resizeCanvas(_image, QSize(newWidth, newHeight));
-        update();
-    }
-
-}
-
-void Canvas::resizeCanvas(QImage *image, const QSize &newSize)
-{
-    if(image->size() == newSize) return;
-
+    if(_image->size() == newSize) return;
     QImage newImage(newSize, QImage::Format_ARGB32);
     newImage.fill(Qt::transparent);
     QPainter painter(&newImage);
@@ -500,7 +496,7 @@ void Canvas::addImage(const QString &name, const QImage &im)
     _layers.insert(pos,
                        {
                        QString("Layer %0 - %1").arg(_c++).arg(name),
-                       im.scaled(_image->size(), Qt::IgnoreAspectRatio), true});
+                       im.scaled(_image->size(), Qt::IgnoreAspectRatio),  true});
     _model.insertRow(pos);
      emit setSelected(_model.index(pos));
      _image = &_layers[pos].content();

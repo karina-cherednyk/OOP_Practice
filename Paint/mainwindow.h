@@ -19,15 +19,19 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    Canvas _canvas;
+
     QAction* _currTool;
     QMap<Tool, QIcon> _toolIcons;
+    QWidget* _container;
+
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    Canvas _canvas;
+protected:
     void closeEvent(QCloseEvent* event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     Ui::MainWindow *ui;

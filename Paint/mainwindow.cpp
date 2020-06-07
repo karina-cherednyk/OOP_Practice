@@ -317,3 +317,8 @@ void MainWindow::setCurrentTool(Tool t)
 }
 
 
+
+void MainWindow::on_actionSelect_All_triggered()
+{
+    _canvas.selectAll();
+}

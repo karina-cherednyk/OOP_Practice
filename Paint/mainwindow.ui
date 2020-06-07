@@ -85,11 +85,14 @@
     <addaction name="actionBrush"/>
     <addaction name="actionBucket"/>
     <addaction name="actionEraser"/>
-    <addaction name="actionSelect"/>
+    <addaction name="actionSpray"/>
+    <addaction name="separator"/>
     <addaction name="actionRectangle"/>
     <addaction name="actionEllipse"/>
     <addaction name="actionTriangle"/>
-    <addaction name="actionSpray"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect"/>
+    <addaction name="actionSelect_All"/>
    </widget>
    <widget class="QMenu" name="menuFilters">
     <property name="title">
@@ -511,6 +514,15 @@
    </property>
    <property name="text">
     <string>Down Layer</string>
+   </property>
+  </action>
+  <action name="actionSelect_All">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/select.png</normaloff>:/icons/select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select All</string>
    </property>
   </action>
  </widget>

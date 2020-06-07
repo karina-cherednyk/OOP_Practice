@@ -79,13 +79,18 @@ bool Canvas::openImage(const QString &fileName)
       if (!loadedImage.load(fileName))
           return false;
 
-      QSize newSize = loadedImage.size();
-      _layers.append(Layer(fileName, loadedImage));
-      _image = &_layers.last().content();
-      _modified = false;
-      resize(newSize);
+      QImage preparedImage(loadedImage.size(), QImage::Format_ARGB32);
+      QPainter p(&preparedImage);
+      p.drawImage(QPoint(0,0),loadedImage);
 
+
+      insertLayer(_model.index(_layers.size()-1));
+      *_image = preparedImage;
+      resize(qMax(_image->width(),width()), qMax(_image->height(), height()));
+      _modified = false;
       update();
+      _model.dataChanged(_model.index(_layers.size()-1),_model.index(_layers.size()-1) );
+      saveState();
       return true;
 }
 
@@ -137,6 +142,15 @@ void Canvas::setTool(const Canvas::Tool &t)
 
     emit toolSet(_tool);
 
+}
+
+void Canvas::selectAll()
+{
+     _selection.setSelectionRect(geometry());
+     _selection.setImage(*_image);
+     _selection.setAdjustMode();
+     setTool(Select);
+     update();
 }
 
 
@@ -389,7 +403,12 @@ void Canvas::saveState()
 
 void Canvas::resizeEvent(QResizeEvent *event)
 {
-       if(!_layers.isEmpty()) resizeImage(_image, size());
+
+       if(!_layers.isEmpty()){
+           int maxH = qMax(height(), _image->height());
+           int maxW = qMax(width(), _image->width());
+           resizeImage(_image, QSize(maxW, maxH));
+       }
        ResizableInnerWidget::resizeEvent(event);
 }
 

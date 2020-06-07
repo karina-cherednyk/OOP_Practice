@@ -35,6 +35,7 @@ public:
     bool saveImage(const QString& file, const char* fileFormat);
     void setPenWidth(int width);
     void setTool(const Tool& t);
+    void selectAll();
     QImage getResImage();
 
 

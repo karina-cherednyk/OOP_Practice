@@ -18,6 +18,7 @@ public:
 public slots:
     void changeSample(QColor color);
     void changeGradient(QColor color);
+    void setColor(QColor c);
 
 public:
     int curr_red = 0;

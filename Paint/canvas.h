@@ -21,7 +21,7 @@ class Canvas : public ResizableInnerWidget
     QCursor _CWCursor;
 
 public:
-    enum Tool { Pen , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Triangle, Spray, ColorPicker, Rotate };
+    enum Tool { Line, Brush , Bucket, Eraser, Select, Paste, Ellipse, Rectangle, Triangle, Spray, ColorPicker, Rotate };
 
     explicit Canvas(QWidget *parent = nullptr);
     ~Canvas();
@@ -65,6 +65,7 @@ signals:
     void redrawLayout(int row);
     void setSelected(const QModelIndex& ind);
     void toolSet(Tool t);
+    void colorSet(QColor color);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -100,7 +101,8 @@ private:
     LayerModel _model; //model for layerList
     int _c; //counts how many layers were created from the start, used to give name to new layer
     bool _modified; //was canvas content saved to file?
-    QPoint _lastPoint; //point when user pressed on canvas
+    QPoint _pressPoint; //point when user pressed on canvas
+    QPoint _lastPoint; //for line tool
     QList<QPair<QImage*,QImage>> _saves; //used with redo/undo actions
     int _curSave; //index of curent save in _saves
     int _lastAvailableSave; //as data in saves is often rewritten, holds index of last possible save image, is used in redo action

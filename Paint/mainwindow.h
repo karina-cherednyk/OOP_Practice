@@ -75,5 +75,6 @@ private slots:
     void on_actionDownLayer_triggered();
     void on_actionSelect_All_triggered();
     void on_actionNew_triggered();
+    void on_actionLine_triggered();
 };
 #endif // MAINWINDOW_H

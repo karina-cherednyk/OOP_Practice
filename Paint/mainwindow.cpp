@@ -111,13 +111,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle("Graphics Editor");
     setFocusPolicy(Qt::StrongFocus);
+
+    //connect colorPicker widget and canvas oicker tool
+    connect(&_canvas, SIGNAL(colorSet(QColor)), ui->colorpicker, SLOT(setColor(QColor)));
 }
 
 
 
 void MainWindow::addToolmages()
 {
-    _toolIcons.insert(Tool::Pen, QIcon(":/icons/brush.png"));
+    _toolIcons.insert(Tool::Brush, QIcon(":/icons/brush.png"));
     _toolIcons.insert(Tool::Bucket,  QIcon(":/icons/fill.png"));
     _toolIcons.insert(Tool::Eraser,  QIcon(":/icons/erase.png"));
     _toolIcons.insert(Tool::Select,  QIcon(":/icons/select.png"));
@@ -128,6 +131,7 @@ void MainWindow::addToolmages()
     _toolIcons.insert(Tool::ColorPicker,  QIcon(":/icons/picker.png"));
     _toolIcons.insert(Tool::Rotate,  QIcon(":/icons/acw.png"));
     _toolIcons.insert(Tool::Triangle, QIcon(":/icons/triangle.png"));
+    _toolIcons.insert(Tool::Line, QIcon(":/icons/line.png"));
 }
 
 MainWindow::~MainWindow()
@@ -245,7 +249,7 @@ void MainWindow::invokePenWidthDialog()
 
 void MainWindow::on_actionBrush_triggered()
 {
-    _canvas.setTool(Canvas::Pen);
+    _canvas.setTool(Canvas::Brush);
 }
 
 void MainWindow::on_actionBucket_triggered()
@@ -358,3 +362,8 @@ void MainWindow::on_actionSelect_All_triggered()
     _canvas.selectAll();
 }
 
+
+void MainWindow::on_actionLine_triggered()
+{
+    _canvas.setTool(Canvas::Line);
+}

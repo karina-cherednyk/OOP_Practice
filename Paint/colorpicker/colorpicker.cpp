@@ -53,7 +53,19 @@ void ColorPicker::changeSample(QColor color)
         emit colorSet(c);
 }
 
+void ColorPicker::setColor(QColor color){
+    ui->sample->setPalette(color);
 
+    QLinearGradient colorGradient = QLinearGradient(0, 0, width(), 0);
+    colorGradient.setSpread(QGradient::RepeatSpread);
+    colorGradient.setColorAt(0, QColor(255,255,255));
+    colorGradient.setColorAt(0.2, color);
+    colorGradient.setColorAt(0.55, Qt::black);
+    QBrush colorGradiantBrush = QBrush(colorGradient);
+    QPalette pal;
+    pal.setBrush(QPalette::Window, colorGradiantBrush);
+    ui->colorGradient->setPalette(pal);
+}
 void ColorPicker::changeGradient(QColor color){
 
     QLinearGradient colorGradient = QLinearGradient(0, 0, width(), 0);

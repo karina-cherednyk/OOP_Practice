@@ -17,7 +17,7 @@ Canvas::Canvas(QWidget *parent) :
     _modified(false),_curSave(-1),_lastAvailableSave(-1),
     _image(nullptr),_model(this),
     _selection(this),_shape(this),
-    _tool(Pen),_c(0),
+    _tool(Brush),_c(0),
     _CWCursor(QPixmap(":/icons/cw.png")),_ACWCursor(QPixmap(":/icons/acw.png"))
 {
     setAttribute(Qt::WA_StyledBackground, true);
@@ -61,6 +61,10 @@ void Canvas::paintEvent(QPaintEvent *event)
         painter.drawImage(origin, _selection.getTransformedImage());
         painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
         painter.drawRect(QRect(origin, _rotation.getRotatingRect().size()));
+    }
+    else if(_tool == Line){
+        painter.setPen(QPen(_penColor, _penWidth));
+        painter.drawLine(_pressPoint, _lastPoint);
     }
     else if(isShapeTool()){
         painter.setPen(QPen(getToolColor(),_penWidth));
@@ -165,7 +169,6 @@ void Canvas::removeAll()
     _layers.clear();
     _saves.clear();
 
-    _selection.removeSelection();
     _selection.removeSelection();
     update();
     _model.dataChanged(0, _layers.size() - 1);
@@ -293,7 +296,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     if(_beingResized) return;
 
     const QPoint& p = event->pos();
-    if(_tool == Pen || _tool == Eraser ) drawLineTo(p);
+    if(_tool == Brush || _tool == Eraser ) drawLineTo(p);
+    else if(_tool == Line) {_lastPoint = p; update(); }
     else if(_tool == ColorPicker) pickColor(p);
     else if(_tool == Spray) drawSpray(p);
     else if(_tool == Rotate) {
@@ -341,7 +345,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     if(_beingResized) return;
 
     const QPoint& p = event->pos();
-    if(_tool == Pen || _tool == Eraser) _lastPoint = p;
+    if(_tool == Brush || _tool == Eraser || _tool == Line) _pressPoint= _lastPoint = p;
     else if(_tool == ColorPicker) pickColor(p);
     else if(_tool == Spray) drawSpray(p);
     else if(_tool == Bucket) fill(p);
@@ -398,6 +402,11 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
         painter.drawImage(origin, _selection.getTransformedImage());
         setCursor(Qt::ArrowCursor);
     }
+    else if(_tool == Line){
+        QPainter painter(_image);
+        painter.setPen(QPen(_penColor, _penWidth));
+        painter.drawLine(_pressPoint, _lastPoint);
+    }
 
     if( _tool != ColorPicker) saveState();
 
@@ -424,7 +433,7 @@ void Canvas::saveState()
 
     int curInd = getIndex(_image,_layers); assert(curInd!=-1);
     _model.dataChanged(curInd);
-    //qDebug() << "cur av"<<_curSave <<", last av "<<_lastAvailableSave <<", all "<<_saves.size();
+
 }
 
 
@@ -446,15 +455,15 @@ void Canvas::drawLineTo(const QPoint &nextPoint)
     if(_selection.hasSelection()) painter.setClipRect(_selection.getWorkingRect());
     if(_tool == Eraser) painter.setCompositionMode(QPainter::CompositionMode_Clear);
     painter.setPen(QPen(getToolColor(),_penWidth));
-    painter.drawLine(_lastPoint,nextPoint);
+    painter.drawLine(_pressPoint,nextPoint);
 
     int rad = (_penWidth / 2) + 2;
 
-    update(QRect(_lastPoint, nextPoint)
+    update(QRect(_pressPoint, nextPoint)
            .normalized()
            .adjusted(-rad, -rad, +rad, +rad));
 
-    _lastPoint = nextPoint;
+    _pressPoint = nextPoint;
 }
 
 
@@ -553,7 +562,7 @@ void Canvas::addImage(const QString &name, const QImage &im)
 }
 
 void Canvas::pickColor(QPoint pos){
-    _penColor = _image->pixelColor(pos);
+    setPenColor(_image->pixelColor(pos));
 }
 Canvas::~Canvas()
 {
@@ -577,6 +586,7 @@ bool Canvas::isModified() const
 void Canvas::setPenColor(const QColor &color)
 {
     _penColor = color;
+    emit colorSet(color);
 }
 
 void Canvas::setPenWidth(int width)

@@ -23,7 +23,9 @@ SOURCES += \
     filters/blackandwhitefilter.cpp \
     filters/brightnessfilter.cpp \
     filters/contrastfilter.cpp \
+    filters/gaussianblur.cpp \
     filters/grayfilter.cpp \
+    filters/medianfilter.cpp \
     filters/negativefilter.cpp \
     filters/noisefilter.cpp \
     filters/peronmalikblur.cpp \
@@ -45,7 +47,9 @@ HEADERS += \
     filters/blackandwhitefilter.h \
     filters/brightnessfilter.h \
     filters/contrastfilter.h \
+    filters/gaussianblur.h \
     filters/grayfilter.h \
+    filters/medianfilter.h \
     filters/negativefilter.h \
     filters/noisefilter.h \
     filters/peronmalikblur.h \

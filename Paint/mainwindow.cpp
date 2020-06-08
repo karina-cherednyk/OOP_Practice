@@ -17,7 +17,9 @@
 #include <filters/blackandwhitefilter.h>
 #include <filters/brightnessfilter.h>
 #include <filters/contrastfilter.h>
+#include <filters/gaussianblur.h>
 #include <filters/grayfilter.h>
+#include <filters/medianfilter.h>
 #include <filters/negativefilter.h>
 #include <filters/noisefilter.h>
 #include <filters/peronmalikblur.h>
@@ -350,6 +352,11 @@ void MainWindow::on_actionRGBA_triggered() { showFilterForm(new RGBAFilter);}
 
 void MainWindow::on_actionSepia_triggered() { showFilterForm(new SepiaFilter);}
 
+void MainWindow::on_actionMedian_triggered() { showFilterForm(new MedianFilter);}
+
+void MainWindow::on_actionGaussian_triggered() { showFilterForm(new GaussianBlur);}
+
+
 void MainWindow::setCurrentTool(Tool t)
 {
     _currTool->setIcon(_toolIcons[t]);
@@ -367,3 +374,7 @@ void MainWindow::on_actionLine_triggered()
 {
     _canvas.setTool(Canvas::Line);
 }
+
+
+
+

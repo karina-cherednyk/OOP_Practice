@@ -31,8 +31,8 @@ FilterForm::FilterForm( AFilter* filt, const QImage& im, QWidget *parent) :
         pol.setHorizontalStretch(1);
         name->setSizePolicy(pol);
         param->setSizePolicy(pol);
-        param->setText("5");
-        param->setMaxLength(5);
+        param->setText(QString::number(p.def));
+        //param->setMaxLength(5);
         param->setObjectName(p.name);
         _form->addRow(name, param);_form->itemAt(0,  QFormLayout::FieldRole)->widget()->objectName();
     }

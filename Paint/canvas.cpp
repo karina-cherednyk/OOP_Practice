@@ -286,6 +286,7 @@ void Canvas::moveLayer(const QModelIndex& ind, bool up){
       const QModelIndex& toInd = _model.index(to);
       _model.dataChanged(to,i);
       emit setSelected(toInd);
+      update();
 }
 
 
@@ -389,6 +390,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     }
     else if(isShapeTool()){
         _shape.processRelease();
+
         update(_shape.getUpdateRect());
         QPainter painter(_image);
         painter.setPen(QPen(getToolColor(),_penWidth));

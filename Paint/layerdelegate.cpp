@@ -90,7 +90,7 @@ void LayerDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionView
     QLineEdit* label = editor->findChild<QLineEdit*>();
     QCheckBox* box =  editor->findChild<QCheckBox*>();
 
-    QRect boxRect = QRect(label->width()+10, 0, 20 , 20);
+    QRect boxRect = QRect(rect.right()-20 , 0, 20 , 20);
     box->setGeometry(boxRect);
 }
 

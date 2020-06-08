@@ -76,5 +76,7 @@ private slots:
     void on_actionSelect_All_triggered();
     void on_actionNew_triggered();
     void on_actionLine_triggered();
+    void on_actionMedian_triggered();
+    void on_actionGaussian_triggered();
 };
 #endif // MAINWINDOW_H

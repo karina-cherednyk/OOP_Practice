@@ -166,6 +166,7 @@ void Canvas::removeAll()
     _saves.clear();
 
     _selection.removeSelection();
+    _selection.removeSelection();
     update();
     _model.dataChanged(0, _layers.size() - 1);
     setEnabled(false);

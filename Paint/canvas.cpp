@@ -35,7 +35,11 @@ void drawTriangle(QPainter& p, const QRect& bounds){
     p.drawLine(bounds.bottomRight(), topMiddle);
     p.drawLine(bounds.bottomLeft(), bounds.bottomRight());
 }
-
+int getIndex(const QImage* im,  QList<Layer>&list){
+   for(int i=0; i<list.size(); ++i)
+       if(&(list[i].content()) == im) return i;
+   return -1;
+}
 void Canvas::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -90,7 +94,7 @@ bool Canvas::openImage(const QString &fileName)
       resize(qMax(_image->width(),width()), qMax(_image->height(), height()));
       _modified = false;
       update();
-      _model.dataChanged(_model.index(_layers.size()-1),_model.index(_layers.size()-1) );
+      _model.dataChanged(_layers.size() - 1);
       saveState();
       return true;
 }
@@ -155,11 +159,18 @@ void Canvas::selectAll()
 void Canvas::removeAll()
 {
     if(_layers.isEmpty()) return;
-    const QModelIndex& f = _model.index(0), l = _model.index(_layers.size()-1);
+
+
+    for(int i=0; i<_layers.size(); ++i) removeImageFromSaves(&_layers[i].content());
     _layers.clear();
     _saves.clear();
+
+    _selection.removeSelection();
     update();
-    _model.dataChanged(f,l);
+    _model.dataChanged(0, _layers.size() - 1);
+    setEnabled(false);
+    emit redoSignal(false);
+    emit undoSignal(false);
 }
 
 
@@ -175,7 +186,8 @@ void Canvas::redo()
     }
     emit redoSignal(_curSave+1<=_lastAvailableSave);
     emit undoSignal(true);
-    _model.dataChanged(_model.index(0),_model.index(_layers.size()-1));
+   _model.dataChanged(0, _layers.size() - 1);
+   _selection.removeSelection();
 }
 
 void Canvas::undo()
@@ -187,7 +199,8 @@ void Canvas::undo()
 
     emit undoSignal( _curSave);
     emit redoSignal(true);
-    _model.dataChanged(_model.index(0),_model.index(_layers.size()-1));
+    _model.dataChanged(0, _layers.size() - 1);
+    _selection.removeSelection();
 
 }
 void clearArea(QImage& image, const QRect& area){
@@ -202,7 +215,9 @@ void Canvas::cut()
     if(_selection.hasSelection()){
         _selection.setImage(_image->copy(_selection.getWorkingRect()));
         clearArea(*_image, _selection.getWorkingRect());
+        _selection.removeSelection();
         update(_selection.getUpdateRect());
+        _model.dataChanged(getIndex(_image, _layers));
         saveState();
         emit pasteSignal();
     }
@@ -234,6 +249,7 @@ void Canvas::insertLayer(const QModelIndex &ind)
      emit setSelected(_model.index(pos));
      setEnabled(true);
      saveState();
+     //qDebug() << "cur av"<<_curSave <<", last av "<<_lastAvailableSave <<", all "<<_saves.size();
 }
 
 void Canvas::removeLayer(const QModelIndex &ind)
@@ -249,8 +265,10 @@ void Canvas::removeLayer(const QModelIndex &ind)
     }
     else if(r!=0) { _image = &_layers[r-1].content(); emit setSelected(_model.index(r-1)); }
     else { _image = &_layers[r+1].content(); emit setSelected(_model.index(r)); }
+    removeImageFromSaves(&_layers[r].content());
     _layers.removeAt(r);
-    _model.dataChanged(ind,ind);
+    _model.dataChanged(r);
+    update();
 
 }
 
@@ -262,7 +280,7 @@ void Canvas::moveLayer(const QModelIndex& ind, bool up){
      if(to==-1 || to==_layers.size() || _layers.isEmpty()) return;
       _layers.swapItemsAt(i,to);
       const QModelIndex& toInd = _model.index(to);
-      _model.dataChanged(toInd,ind);
+      _model.dataChanged(to,i);
       emit setSelected(toInd);
 }
 
@@ -404,8 +422,8 @@ void Canvas::saveState()
     _modified = true;
 
     int curInd = getIndex(_image,_layers); assert(curInd!=-1);
-    const QModelIndex& changed = _model.index(curInd);
-    _model.dataChanged(changed, changed);
+    _model.dataChanged(curInd);
+    //qDebug() << "cur av"<<_curSave <<", last av "<<_lastAvailableSave <<", all "<<_saves.size();
 }
 
 
@@ -528,7 +546,9 @@ void Canvas::addImage(const QString &name, const QImage &im)
     _model.insertRow(pos);
      emit setSelected(_model.index(pos));
      _image = &_layers[pos].content();
+     _selection.removeSelection();
      setEnabled(true);
+     saveState();
 }
 
 void Canvas::pickColor(QPoint pos){
@@ -582,11 +602,7 @@ void Canvas::clearImage()
     saveState();
     update();
 }
-int getIndex(const QImage* im,  QList<Layer>&list){
-   for(int i=0; i<list.size(); ++i)
-       if(&(list[i].content()) == im) return i;
-   return -1;
-}
+
 bool Canvas::isShapeTool()
 {
     return _tool == Rectangle || _tool == Ellipse || _tool == Triangle;
@@ -597,4 +613,18 @@ void Canvas::drawShape(QPainter &painter)
     if(_tool == Rectangle) painter.drawRect(_shape.getWorkingRect());
     else  if(_tool == Ellipse) painter.drawEllipse(_shape.getWorkingRect());
     else if( _tool == Triangle) drawTriangle(painter, _shape.getWorkingRect());
+}
+
+void Canvas::removeImageFromSaves(QImage *im)
+{
+    QList<QPair<QImage*, QImage>>::iterator it = _saves.begin();
+    while (it != _saves.end()) {
+      if ((*it).first == im)
+        it = _saves.erase(it);
+      else
+        ++it;
+    }
+    _curSave = _lastAvailableSave = _saves.size()-1;
+    if(_saves.isEmpty()) emit undoSignal(false);
+    emit redoSignal(false);
 }

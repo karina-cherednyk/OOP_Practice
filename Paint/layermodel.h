@@ -46,8 +46,12 @@ public:
         endRemoveRows();
         return true;
     }
-
-
+    inline void dataChanged(int r, int r2){
+        QAbstractListModel::dataChanged(index((r)), index(r2));
+    }
+    inline void dataChanged(int r){
+        dataChanged(r,r);
+    }
 signals:
     void changedIndex(const QModelIndex& index);
 

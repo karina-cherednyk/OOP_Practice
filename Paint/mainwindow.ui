@@ -416,7 +416,7 @@
     <string>Paste</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+P</string>
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionRectangle">

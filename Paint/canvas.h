@@ -90,6 +90,7 @@ private:
     void pasteImage(QPoint pos);
     bool isShapeTool();
     void drawShape(QPainter& p);
+    void removeImageFromSaves(QImage* im);
     QColor getToolColor();
 
 

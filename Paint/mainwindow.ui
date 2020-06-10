@@ -106,11 +106,12 @@
     <addaction name="actionGray"/>
     <addaction name="actionNegative"/>
     <addaction name="actionNoise"/>
-    <addaction name="actionPerona_Malik_Blur"/>
     <addaction name="actionRGBA"/>
     <addaction name="actionSepia"/>
     <addaction name="actionMedian"/>
     <addaction name="actionGaussian"/>
+    <addaction name="actionSobel"/>
+    <addaction name="actionCanny"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOption"/>
@@ -404,7 +405,7 @@
     <string>Copy</string>
    </property>
    <property name="shortcut">
-    <string/>
+    <string>Ctrl+C</string>
    </property>
   </action>
   <action name="actionPaste">
@@ -614,6 +615,16 @@
   <action name="actionGaussian">
    <property name="text">
     <string>Gaussian</string>
+   </property>
+  </action>
+  <action name="actionSobel">
+   <property name="text">
+    <string>Sobel</string>
+   </property>
+  </action>
+  <action name="actionCanny">
+   <property name="text">
+    <string>Canny</string>
    </property>
   </action>
  </widget>

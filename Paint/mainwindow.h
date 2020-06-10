@@ -66,7 +66,6 @@ private slots:
     void on_actionGray_triggered();
     void on_actionNegative_triggered();
     void on_actionNoise_triggered();
-    void on_actionPerona_Malik_Blur_triggered();
     void on_actionRGBA_triggered();
     void on_actionSepia_triggered();
     void setCurrentTool(Tool t);
@@ -78,5 +77,7 @@ private slots:
     void on_actionLine_triggered();
     void on_actionMedian_triggered();
     void on_actionGaussian_triggered();
+    void on_actionSobel_triggered();
+    void on_actionCanny_triggered();
 };
 #endif // MAINWINDOW_H

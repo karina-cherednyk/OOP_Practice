@@ -23,11 +23,10 @@ Canvas::Canvas(QWidget *parent) :
     setAttribute(Qt::WA_StyledBackground, true);
     setStyleSheet("background-image: url(:/icons/background.png);border: 1px solid grey");
     ui->setupUi(this);
-    setFocusPolicy(Qt::StrongFocus);
     connect(&_model, SIGNAL(changedIndex(const QModelIndex& )),SLOT(setCurrentLayer(const QModelIndex& )));
     _model.setLayersModel(&_layers);
     setEnabled(false);
-    setFocusPolicy(Qt::TabFocus);
+    setFocusPolicy(Qt::StrongFocus);
 }
 void drawTriangle(QPainter& p, const QRect& bounds){
     QPoint topMiddle((bounds.left()+bounds.right())/2, bounds.top());
@@ -51,6 +50,27 @@ void Canvas::paintEvent(QPaintEvent *event)
        if(_layers[i].visible())  {
            resizeImage(&_layers[i].content(), size());
            painter.drawImage(drawingArea, _layers[i].content(),drawingArea);
+           if(&_layers[i].content() == _image){
+               if(_tool == Rotate){
+                   painter.save();
+                   painter.translate(_rotation.center());
+                   painter.rotate(_rotation.angle());
+                   QPoint origin = _rotation.getAfterTransformOriginPoint();
+                   painter.drawImage(origin, _selection.getTransformedImage());
+                   painter.restore();
+               }
+               else if(_tool == Line){
+                   painter.setPen(QPen(_penColor, _penWidth));
+                   painter.drawLine(_pressPoint, _lastPoint);
+               }
+               else if(isShapeTool() && _shape.hasSelection()){
+                   painter.setPen(QPen(getToolColor(),_penWidth));
+                   drawShape(painter);
+               }
+               else if(_selection.hasSelection()){
+                   if(!_selection.isNoneMode()) painter.drawImage(_selection.getWorkingRect(),_selection.getTransformedImage());
+               }
+           }
        }
     }
 
@@ -58,23 +78,13 @@ void Canvas::paintEvent(QPaintEvent *event)
         painter.translate(_rotation.center());
         painter.rotate(_rotation.angle());
         QPoint origin = _rotation.getAfterTransformOriginPoint();
-        painter.drawImage(origin, _selection.getTransformedImage());
         painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
         painter.drawRect(QRect(origin, _rotation.getRotatingRect().size()));
-    }
-    else if(_tool == Line){
-        painter.setPen(QPen(_penColor, _penWidth));
-        painter.drawLine(_pressPoint, _lastPoint);
-    }
-    else if(isShapeTool()){
-        painter.setPen(QPen(getToolColor(),_penWidth));
-        drawShape(painter);
     }
     else if(_selection.hasSelection()){
         if(_selection.isFinished())
             painter.setPen(QPen(Qt::black,2,Qt::DashDotLine));
         else  painter.setPen(QPen(Qt::blue,2,Qt::DashDotLine));
-        if(!_selection.isNoneMode()) painter.drawImage(_selection.getWorkingRect(),_selection.getTransformedImage());
         painter.drawRect(_selection.getWorkingRect());
     }
 

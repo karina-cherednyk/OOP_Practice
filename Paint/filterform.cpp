@@ -70,7 +70,7 @@ void FilterForm::on_tryButton_clicked()
     QHash<QString, double>* coeffs = new QHash<QString, double>;
     QLineEdit* edit;
     for(int i=0; i<_form->rowCount(); i++){
-        edit = qobject_cast<QLineEdit*> (_form->itemAt(0,  QFormLayout::FieldRole)->widget());
+        edit = qobject_cast<QLineEdit*> (_form->itemAt(i,  QFormLayout::FieldRole)->widget());
         coeffs->insert(edit->objectName(), edit->text().toDouble());
     }
     if(_res) delete _res;

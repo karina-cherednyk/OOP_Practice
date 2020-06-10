@@ -16,6 +16,7 @@
 #include <QToolButton>
 #include <filters/blackandwhitefilter.h>
 #include <filters/brightnessfilter.h>
+#include <filters/cannyfilter.h>
 #include <filters/contrastfilter.h>
 #include <filters/gaussianblur.h>
 #include <filters/grayfilter.h>
@@ -25,6 +26,7 @@
 #include <filters/peronmalikblur.h>
 #include <filters/rgbafilter.h>
 #include <filters/sepiafilter.h>
+#include <filters/sobelfilter.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -346,7 +348,6 @@ void MainWindow::on_actionNegative_triggered() { showFilterForm(new NegativeFilt
 
 void MainWindow::on_actionNoise_triggered() { showFilterForm(new NoiseFilter);}
 
-void MainWindow::on_actionPerona_Malik_Blur_triggered() { showFilterForm(new PeronaMalikBlur);}
 
 void MainWindow::on_actionRGBA_triggered() { showFilterForm(new RGBAFilter);}
 
@@ -356,6 +357,9 @@ void MainWindow::on_actionMedian_triggered() { showFilterForm(new MedianFilter);
 
 void MainWindow::on_actionGaussian_triggered() { showFilterForm(new GaussianBlur);}
 
+void MainWindow::on_actionSobel_triggered() { showFilterForm(new SobelFilter);}
+
+void MainWindow::on_actionCanny_triggered() { showFilterForm(new CannyFilter);}
 
 void MainWindow::setCurrentTool(Tool t)
 {
@@ -374,6 +378,9 @@ void MainWindow::on_actionLine_triggered()
 {
     _canvas.setTool(Canvas::Line);
 }
+
+
+
 
 
 

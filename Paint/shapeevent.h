@@ -11,6 +11,7 @@ protected:
 
     QRect  _workingRect, _updateRect;
     QWidget* _widget;
+    bool _isVisible;
 
 
    bool possiblySetSelectionMode(QPoint pos);
@@ -34,6 +35,7 @@ public:
     inline ShapeEvent(QWidget* w):_widget(w){}
     inline virtual void processPress(QPoint p){
         newWorkingRect(p);
+        _isVisible = true;
     }
     inline virtual void processMove(QPoint p){
         _updateRect = _workingRect;
@@ -44,6 +46,7 @@ public:
     {
          _widget->setCursor(Qt::ArrowCursor);
         _updateRect = _workingRect.adjusted(-3, -3, +3, +3);
+        _isVisible = false;
 
     }
 
@@ -55,7 +58,12 @@ public:
     inline const QRect& getUpdateRect(){
         return _updateRect;
     }
-
+    /**
+     * will selected rect be displayed on canvas
+     */
+    inline bool hasSelection(){
+        return _isVisible;
+    }
 
 
 };

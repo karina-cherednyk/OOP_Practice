@@ -22,6 +22,7 @@ SOURCES += \
     filters/afilter.cpp \
     filters/blackandwhitefilter.cpp \
     filters/brightnessfilter.cpp \
+    filters/cannyfilter.cpp \
     filters/contrastfilter.cpp \
     filters/gaussianblur.cpp \
     filters/grayfilter.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
     filters/peronmalikblur.cpp \
     filters/rgbafilter.cpp \
     filters/sepiafilter.cpp \
+    filters/sobelfilter.cpp \
     layerdelegate.cpp \
     layermodel.cpp \
     main.cpp \
@@ -46,6 +48,7 @@ HEADERS += \
     filters/afilter.h \
     filters/blackandwhitefilter.h \
     filters/brightnessfilter.h \
+    filters/cannyfilter.h \
     filters/contrastfilter.h \
     filters/gaussianblur.h \
     filters/grayfilter.h \
@@ -55,6 +58,7 @@ HEADERS += \
     filters/peronmalikblur.h \
     filters/rgbafilter.h \
     filters/sepiafilter.h \
+    filters/sobelfilter.h \
     layerdelegate.h \
     layermodel.h \
     mainwindow.h \

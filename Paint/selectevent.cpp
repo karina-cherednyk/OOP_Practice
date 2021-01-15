@@ -88,7 +88,9 @@ bool SelectEvent::possiblyResizeSelectionRect(QPoint pos)
     }
     return true;
 }
-
+/**
+ * process mousePress event
+ */
 void SelectEvent::processPress(QPoint p){
     _selectionFinished = false;
 
@@ -101,7 +103,9 @@ void SelectEvent::processPress(QPoint p){
     newWorkingRect(_lastPoint);
 }
 
-
+/**
+ * process mouseMove event
+ */
 void SelectEvent::processMove(QPoint p)
 {
         _updateRect = _workingRect;
@@ -115,7 +119,9 @@ void SelectEvent::processMove(QPoint p)
          //update
         (_updateRect |= _workingRect).adjust(-3, -3, +3, +3);
 }
-
+/**
+ * process mouseRelease event
+ */
 void SelectEvent::processRelease(){
     _selectionFinished = true;
     _widget->setCursor(Qt::ArrowCursor);

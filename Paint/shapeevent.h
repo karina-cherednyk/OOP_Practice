@@ -33,15 +33,27 @@ protected:
 
 public:
     inline ShapeEvent(QWidget* w):_widget(w){}
+
+    /**
+     * process mousePress event
+     */
     inline virtual void processPress(QPoint p){
         newWorkingRect(p);
         _isVisible = true;
     }
+
+    /**
+     * process mouseMove event
+     */
     inline virtual void processMove(QPoint p){
         _updateRect = _workingRect;
         resizeWorkingRectTo(p);
         (_updateRect |= _workingRect).adjust(-3, -3, +3, +3);
     }
+
+    /**
+     * process mouseRelease event
+     */
     inline virtual void processRelease()
     {
          _widget->setCursor(Qt::ArrowCursor);
@@ -50,6 +62,12 @@ public:
 
     }
 
+    /**
+     * will selected rect be displayed on canvas
+     */
+    inline bool hasSelection(){
+        return _isVisible;
+    }
 
     inline const QRect& getWorkingRect(){
         return _workingRect;
@@ -58,14 +76,6 @@ public:
     inline const QRect& getUpdateRect(){
         return _updateRect;
     }
-    /**
-     * will selected rect be displayed on canvas
-     */
-    inline bool hasSelection(){
-        return _isVisible;
-    }
-
-
 };
 
 #endif // SHAPEEVENT_H

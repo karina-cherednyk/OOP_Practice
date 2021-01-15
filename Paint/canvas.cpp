@@ -45,7 +45,6 @@ void Canvas::paintEvent(QPaintEvent *event)
 
     QRect drawingArea = event->rect();
 
-
     for(int i=0; i<_layers.size();++i){
        if(_layers[i].visible())  {
            resizeImage(&_layers[i].content(), size());
@@ -263,7 +262,6 @@ void Canvas::insertLayer(const QModelIndex &ind)
      emit setSelected(_model.index(pos));
      setEnabled(true);
      saveState();
-     //qDebug() << "cur av"<<_curSave <<", last av "<<_lastAvailableSave <<", all "<<_saves.size();
 }
 
 void Canvas::removeLayer(const QModelIndex &ind)
@@ -300,7 +298,6 @@ void Canvas::moveLayer(const QModelIndex& ind, bool up){
 }
 
 
-//TODO add 4 cursors for rotation;
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     ResizableInnerWidget::mouseMoveEvent(event);
@@ -379,7 +376,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 }
 
 
-int getIndex(const QImage* im,  QList<Layer>&list);
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
 
     ResizableInnerWidget::mouseReleaseEvent(event);

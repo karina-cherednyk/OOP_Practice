@@ -8,6 +8,9 @@
 #include <QSizePolicy>
 #include <QString>
 
+/**
+ * add params lineEdit and qLabel to form Layout
+ */
 FilterForm::FilterForm( AFilter* filt, const QImage& im, QWidget *parent) :
     QDialog(parent),_origin(im),_res(new QImage(im)),_filter(filt),_name(filt->getFilterName()),
     ui(new Ui::FilterForm)
@@ -64,7 +67,9 @@ QIntValidator *FilterForm::intValidator(int min, int max)
     v->setTop(max);
     return v;
 }
-
+/**
+ * change image based on parameters
+ */
 void FilterForm::on_tryButton_clicked()
 {
     QHash<QString, double>* coeffs = new QHash<QString, double>;

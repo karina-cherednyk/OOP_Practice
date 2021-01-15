@@ -28,7 +28,9 @@
 #include <filters/sepiafilter.h>
 #include <filters/sobelfilter.h>
 
-
+/**
+ * connect all actions
+ */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     _canvas(this) , ui(new Ui::MainWindow) {
@@ -143,13 +145,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+/** ask for saving before closing program
+ */
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(requestSaving()) event->accept();
     else event->ignore();
 }
+/**
+ * make canvas 2/3 of container size on second resize event
+ */
 bool first = true;
-
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
 
@@ -159,14 +165,16 @@ void MainWindow::resizeEvent(QResizeEvent *event)
           first = false;
     }
 }
-//select layer up[l] or down[h]
+/**
+ * select layer up[l] or down[h]
+ */
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     int i = _layerList->currentIndex().row();
     QModelIndex next;
-    if(event->key() == Qt::Key_H && i!= 0)
+    if(event->key() == Qt::Key_L && i!= 0)
          next  = _layerList->model()->index(--i,0);
-    else if(event->key() == Qt::Key_L && i!= _layerList->model()->rowCount()-1)
+    else if(event->key() == Qt::Key_H && i!= _layerList->model()->rowCount()-1)
          next = _layerList->model()->index(++i,0);
     else return;
      _layerList->setCurrentIndex(next);
@@ -213,6 +221,9 @@ bool MainWindow::save(const QByteArray &fileFormat)
    return _canvas.saveImage(fileName, fileFormat.constData());
 
 }
+/**
+ * save canvas current _image in png format, after that Canvas::_modified == false
+ */
 bool MainWindow::save()
 {
 
@@ -221,6 +232,9 @@ bool MainWindow::save()
    return _canvas.saveImage(fileName, fileFormat.constData());
 
 }
+/**
+ * open new image
+ */
 void MainWindow::open()
 {
 
@@ -228,6 +242,9 @@ void MainWindow::open()
     if(!fileName.isEmpty()) _canvas.openImage(fileName);
 
 }
+/**
+ * remove layers and all content from canvas
+ */
 void MainWindow::on_actionNew_triggered()
 {
     if(requestSaving()){
@@ -300,6 +317,21 @@ void MainWindow::on_actionTriangle_triggered()
     _canvas.setTool(Canvas::Triangle);
 }
 
+void MainWindow::setCurrentTool(Tool t)
+{
+    _currTool->setIcon(_toolIcons[t]);
+}
+
+void MainWindow::on_actionSelect_All_triggered()
+{
+    _canvas.selectAll();
+}
+
+void MainWindow::on_actionLine_triggered()
+{
+    _canvas.setTool(Canvas::Line);
+}
+
 void MainWindow::on_actionRemoveLayer_triggered()
 {
     const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
@@ -312,13 +344,17 @@ void MainWindow::on_actionAddLayer_triggered()
     _canvas.insertLayer(selected);
 }
 
-
+/**
+ * switch current layer with layer below
+ */
 void MainWindow::on_actionUpLayer_triggered()
 {
     const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
     _canvas.moveLayer(selected,true);
 }
-
+/**
+ * switch current layer with layer above
+ */
 void MainWindow::on_actionDownLayer_triggered()
 {
     const QModelIndex& selected = _layerList->selectionModel()->currentIndex();
@@ -348,7 +384,6 @@ void MainWindow::on_actionNegative_triggered() { showFilterForm(new NegativeFilt
 
 void MainWindow::on_actionNoise_triggered() { showFilterForm(new NoiseFilter);}
 
-
 void MainWindow::on_actionRGBA_triggered() { showFilterForm(new RGBAFilter);}
 
 void MainWindow::on_actionSepia_triggered() { showFilterForm(new SepiaFilter);}
@@ -360,24 +395,6 @@ void MainWindow::on_actionGaussian_triggered() { showFilterForm(new GaussianBlur
 void MainWindow::on_actionSobel_triggered() { showFilterForm(new SobelFilter);}
 
 void MainWindow::on_actionCanny_triggered() { showFilterForm(new CannyFilter);}
-
-void MainWindow::setCurrentTool(Tool t)
-{
-    _currTool->setIcon(_toolIcons[t]);
-}
-
-
-
-void MainWindow::on_actionSelect_All_triggered()
-{
-    _canvas.selectAll();
-}
-
-
-void MainWindow::on_actionLine_triggered()
-{
-    _canvas.setTool(Canvas::Line);
-}
 
 
 

@@ -98,7 +98,9 @@ QSize LayerDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIn
 {
     return QSize(option.rect.width(),120);
 }
-
+/**
+ * create form with qLineEdit and qCheckBox
+ */
 QWidget *LayerDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QWidget* editor = new QFrame(parent);
